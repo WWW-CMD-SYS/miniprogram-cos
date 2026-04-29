@@ -61,41 +61,41 @@
       </view>
     </view>
 
-    <!-- 文件表格 - TDesign表格组件 -->
+    <!-- 文件表格 - 带斑马纹样式 -->
     <view wx:if="{{ fileList.length > 0 }}" class="file-table">
-      <t-table table-layout="fixed" bordered="{{false}}" stripe="{{true}}" hover>
-        <t-tr>
-          <t-th width="60rpx">
-            <t-checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" />
-          </t-th>
-          <t-th>文件名</t-th>
-          <t-th width="120rpx" align="center">大小</t-th>
-          <t-th width="340rpx" align="right">操作</t-th>
-        </t-tr>
-        <t-tr wx:for="{{ paginatedFiles }}" wx:key="key" 
-              data-key="{{ item.key }}"
-              class="{{ selectedFiles.includes(item.key) ? 'row-selected' : '' }}">
-          <t-td>
+      <!-- 表头 -->
+      <view class="table-header">
+        <view class="th th-checkbox">
+          <t-checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" />
+        </view>
+        <view class="th th-name">文件名</view>
+        <view class="th th-size">大小</view>
+        <view class="th th-op">操作</view>
+      </view>
+
+      <!-- 表体 -->
+      <scroll-view scroll-y class="table-body">
+        <view wx:for="{{ paginatedFiles }}" wx:key="key" 
+              class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ selectedFiles.includes(item.key) ? 'selected' : '' }}">
+          <view class="td td-checkbox">
             <t-checkbox checked="{{ selectedFiles.includes(item.key) }}" bindchange="toggleSelect" data-key="{{ item.key }}" />
-          </t-td>
-          <t-td>
-            <view class="file-info" bindtap="openFile" data-file="{{ item }}">
+          </view>
+          <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
+            <view class="file-info">
               <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="36rpx" />
               <text class="file-name">{{ item.name }}</text>
             </view>
-          </t-td>
-          <t-td align="center">
-            <text class="file-size">{{ formatSize(item.size) }}</text>
-          </t-td>
-          <t-td align="right">
+          </view>
+          <view class="td td-size">{{ formatSize(item.size) }}</view>
+          <view class="td td-op">
             <view class="op-buttons">
               <t-button theme="primary" size="small" variant="text" icon="browse" bindtap="previewFile" data-file="{{ item }}">预览</t-button>
               <t-button theme="success" size="small" variant="text" icon="download" bindtap="downloadFile" data-file="{{ item }}">下载</t-button>
               <t-button theme="danger" size="small" variant="text" icon="delete" bindtap="deleteFile" data-file="{{ item }}">删除</t-button>
             </view>
-          </t-td>
-        </t-tr>
-      </t-table>
+          </view>
+        </view>
+      </scroll-view>
     </view>
 
     <!-- 空状态 -->

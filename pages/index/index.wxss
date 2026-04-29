@@ -211,59 +211,74 @@
   font-size: 24rpx;
 }
 
-/* TDesign 表格斑马纹样式 */
-.file-table .t-table {
-  width: 100%;
+.table-header {
+  display: flex;
+  padding: 20rpx 16rpx;
+  background-color: var(--bg-color);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 2rpx solid var(--border-color);
 }
 
-.file-table .t-tr {
+.table-body {
+  max-height: 700rpx;
+}
+
+/* 斑马纹表格行 */
+.table-row {
+  display: flex;
+  padding: 20rpx 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  align-items: center;
   transition: background-color 0.2s;
 }
 
-.file-table .t-th,
-.file-table .t-td {
-  padding: 20rpx 16rpx;
-  font-size: 24rpx;
-  color: var(--text-primary);
-}
-
-.file-table .t-th {
-  background-color: var(--bg-color);
-  color: var(--text-secondary);
-  font-weight: 500;
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-.file-table .t-td {
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-/* 斑马纹样式 - 奇数行 */
-.file-table .t-tr:nth-child(odd) .t-td {
+/* 奇数行 - 默认背景色 */
+.table-row.zebra-odd {
   background-color: var(--card-bg);
 }
 
-/* 斑马纹样式 - 偶数行 */
-.file-table .t-tr:nth-child(even) .t-td {
+/* 偶数行 - 斑马纹浅蓝色 */
+.table-row.zebra-even {
   background-color: rgba(0, 82, 217, 0.03);
 }
 
 /* 选中行样式 */
-.file-table .t-tr.row-selected .t-td {
-  background-color: rgba(0, 82, 217, 0.08);
+.table-row.selected {
+  background-color: rgba(0, 82, 217, 0.1) !important;
 }
 
-/* 悬停效果 */
-.file-table .t-tr:active .t-td {
-  background-color: rgba(0, 82, 217, 0.1);
+.table-row:active {
+  background-color: rgba(0, 82, 217, 0.12);
 }
 
-/* 隐藏原生滚动区域 */
-.file-table .t-table__scroll {
-  max-height: none;
+.th, .td {
+  display: flex;
+  align-items: center;
 }
 
-/* 保留的样式 */
+.th-checkbox, .td-checkbox {
+  width: 60rpx;
+  justify-content: center;
+}
+
+.th-name, .td-name {
+  flex: 1;
+  padding: 0 16rpx;
+}
+
+.th-size, .td-size {
+  width: 120rpx;
+  justify-content: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.th-op, .td-op {
+  width: 340rpx;
+  justify-content: flex-end;
+}
+
 .file-info {
   display: flex;
   align-items: center;
@@ -279,15 +294,9 @@
   overflow: hidden;
 }
 
-.file-size {
-  font-size: 24rpx;
-  color: var(--text-secondary);
-}
-
 .op-buttons {
   display: flex;
   gap: 4rpx;
-  justify-content: flex-end;
 }
 
 /* ========== 空状态 ========== */
