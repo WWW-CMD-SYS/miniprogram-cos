@@ -325,20 +325,32 @@ Page({
           const keys = [...this.data.selectedFiles];
           let successCount = 0;
           let failCount = 0;
-          const errors = [];
 
-          for (let i = 0; i < keys.length; i++) {
-            try {
-              const result = await apiDeleteFile(keys[i]);
-              if (result.code === 0) {
-                successCount++;
-              } else {
-                failCount++;
-                errors.push(result.message);
+          // 优先尝试批量删除接口
+          try {
+            const result = await apiDeleteFiles(keys);
+            if (result.code === 0) {
+              successCount = keys.length;
+            } else {
+              // 批量接口失败，降级为循环删除
+              console.log('批量删除失败，降级为循环删除:', result.message);
+              for (const key of keys) {
+                const r = await apiDeleteFile(key);
+                if (r.code === 0) successCount++;
+                else failCount++;
               }
-            } catch (e) {
-              failCount++;
-              errors.push(e.message);
+            }
+          } catch (e) {
+            // 网络错误，降级为循环删除
+            console.log('批量删除请求失败，降级为循环删除:', e.message);
+            for (const key of keys) {
+              try {
+                const r = await apiDeleteFile(key);
+                if (r.code === 0) successCount++;
+                else failCount++;
+              } catch {
+                failCount++;
+              }
             }
           }
 
