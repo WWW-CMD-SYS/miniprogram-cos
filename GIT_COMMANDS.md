@@ -17,7 +17,7 @@ git add .
 git add pages/index/index.js
 
 # 提交并写提交信息
-git commit -m "feat: 添加文件上传功能"
+git commit -m "feat: 使用 TDesign组件"
 
 # 提交时显示改动统计
 git commit -stat -m "fix: 修复上传bug"

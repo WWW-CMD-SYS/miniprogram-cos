@@ -4,9 +4,9 @@
   padding-bottom: 40rpx;
 }
 
-/* 头部样式 */
+/* ========== 头部样式 ========== */
 .header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #003a94 100%);
+  background: linear-gradient(135deg, #0052d9 0%, #4364f7 50%, #6fb1fc 100%);
   color: #ffffff;
   padding: 24rpx 32rpx;
   padding-top: calc(env(safe-area-inset-top) + 24rpx);
@@ -17,17 +17,46 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16rpx;
+  gap: 20rpx;
 }
 
 .header-left {
   flex: 1;
-  min-width: 300rpx;
+  min-width: 280rpx;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.logo-icon {
+  font-size: 48rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
 }
 
 .title {
-  font-size: 36rpx;
-  font-weight: bold;
+  font-size: 34rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.subtitle {
+  font-size: 22rpx;
+  opacity: 0.85;
 }
 
 .header-actions {
@@ -37,20 +66,31 @@
   flex-wrap: wrap;
 }
 
-.theme-toggle {
+.theme-btn {
   width: 64rpx;
   height: 64rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  font-size: 32rpx;
+  transition: all 0.3s;
 }
 
-/* 上传区域 */
+.theme-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-group {
+  display: flex;
+  gap: 12rpx;
+}
+
+/* ========== 上传区域 ========== */
 .upload-section {
   margin: 24rpx;
+  padding: 32rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -70,14 +110,22 @@
 .upload-item {
   display: flex;
   justify-content: space-between;
-  padding: 12rpx 16rpx;
+  align-items: center;
+  padding: 16rpx 20rpx;
   background-color: var(--bg-color);
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   margin-bottom: 8rpx;
 }
 
+.upload-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex: 1;
+}
+
 .upload-name {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: var(--text-primary);
   flex: 1;
   overflow: hidden;
@@ -88,21 +136,26 @@
 .upload-status {
   font-size: 24rpx;
   margin-left: 16rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
 }
 
 .upload-status.uploading {
   color: var(--primary-color);
+  background: rgba(0, 82, 217, 0.1);
 }
 
 .upload-status.success {
   color: var(--success-color);
+  background: rgba(0, 133, 66, 0.1);
 }
 
 .upload-status.fail {
   color: var(--danger-color);
+  background: rgba(213, 73, 65, 0.1);
 }
 
-/* 文件列表 */
+/* ========== 文件列表 ========== */
 .file-list-section {
   margin: 0 24rpx 24rpx;
   padding: 0;
@@ -114,15 +167,29 @@
   justify-content: space-between;
   align-items: center;
   padding: 24rpx;
-  background-color: var(--header-bg);
-  color: var(--header-text);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   flex-wrap: wrap;
   gap: 16rpx;
 }
 
+.list-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .list-title {
-  font-size: 28rpx;
-  font-weight: 500;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.file-count {
+  font-size: 22rpx;
+  color: var(--primary-color);
+  background: rgba(0, 82, 217, 0.08);
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
 }
 
 .list-actions {
@@ -131,12 +198,15 @@
   gap: 16rpx;
 }
 
-.selected-count {
-  font-size: 24rpx;
-  opacity: 0.9;
+.selected-badge {
+  background: linear-gradient(135deg, #0052d9 0%, #4364f7 100%);
+  color: #ffffff;
+  font-size: 22rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
 }
 
-/* 表格样式 */
+/* ========== 表格样式 ========== */
 .file-table {
   font-size: 24rpx;
 }
@@ -160,6 +230,7 @@
   border-bottom: 1rpx solid var(--border-color);
   background-color: var(--card-bg);
   align-items: center;
+  transition: background-color 0.2s;
 }
 
 .table-row.selected {
@@ -168,6 +239,10 @@
 
 .table-row:last-child {
   border-bottom: none;
+}
+
+.table-row:active {
+  background-color: rgba(0, 82, 217, 0.08);
 }
 
 .th, .td {
@@ -188,20 +263,23 @@
 .th-size, .td-size {
   width: 120rpx;
   justify-content: center;
-}
-
-.th-type, .td-type {
-  width: 140rpx;
-  justify-content: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
 }
 
 .th-op, .td-op {
-  width: 380rpx;
+  width: 340rpx;
   justify-content: flex-end;
 }
 
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .file-name {
-  color: var(--link-color);
+  color: var(--text-primary);
   word-break: break-all;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -211,41 +289,58 @@
 
 .op-buttons {
   display: flex;
-  gap: 8rpx;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 4rpx;
 }
 
-/* 空状态 */
+/* ========== 空状态 ========== */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx 0;
+  padding: 100rpx 0;
 }
 
-.empty-icon {
-  font-size: 128rpx;
-  margin-bottom: 24rpx;
+.empty-icon-area {
+  width: 180rpx;
+  height: 180rpx;
+  background: linear-gradient(135deg, #f0f5ff 0%, #e6f0ff 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
 }
 
 .empty-text {
+  font-size: 32rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 26rpx;
   color: var(--text-placeholder);
   margin-bottom: 32rpx;
 }
 
-/* 加载状态 */
+/* ========== 加载状态 ========== */
 .loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx 0;
-  color: var(--text-placeholder);
+  padding: 100rpx 0;
 }
 
-/* 分页 */
+.loading-text {
+  font-size: 26rpx;
+  color: var(--text-placeholder);
+  margin-top: 20rpx;
+}
+
+/* ========== 分页 ========== */
 .pagination {
   padding: 24rpx;
   display: flex;
@@ -253,9 +348,28 @@
   align-items: center;
   gap: 24rpx;
   background-color: var(--card-bg);
+  border-top: 1rpx solid var(--border-color);
 }
 
-.page-info {
-  font-size: 26rpx;
+.page-indicator {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  padding: 0 16rpx;
+}
+
+.page-current {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.page-separator {
+  font-size: 24rpx;
+  color: var(--text-placeholder);
+}
+
+.page-total {
+  font-size: 24rpx;
   color: var(--text-secondary);
 }

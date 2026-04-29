@@ -3,28 +3,43 @@
   <view class="header">
     <view class="header-content">
       <view class="header-left">
-        <text class="title">📁 腾讯云COS文件管理器</text>
+        <view class="logo-area">
+          <view class="logo-icon">☁️</view>
+          <view class="title-area">
+            <text class="title">COS 文件管理器</text>
+            <text class="subtitle">腾讯云对象存储</text>
+          </view>
+        </view>
       </view>
       <view class="header-actions">
-        <view class="theme-toggle" bindtap="toggleTheme">
-          <text>{{ isDark ? '☀️' : '🌙' }}</text>
+        <view class="theme-btn" bindtap="toggleTheme">
+          <t-icon name="{{ isDark ? 'sun' : 'moon' }}" size="40rpx" />
         </view>
-        <t-button size="small" theme="default" icon="setting" bindtap="openConfig">配置</t-button>
-        <t-button size="small" theme="primary" icon="refresh" loading="{{ listLoading }}" bindtap="fetchFileList">刷新</t-button>
+        <view class="btn-group">
+          <t-button size="small" theme="light" variant="outline" icon="setting" bindtap="openConfig">配置</t-button>
+          <t-button size="small" theme="primary" icon="refresh" loading="{{ listLoading }}" bindtap="fetchFileList">刷新</t-button>
+        </view>
       </view>
     </view>
   </view>
 
   <!-- 文件上传区 -->
   <view class="upload-section card">
-    <t-button theme="primary" icon="upload" bindtap="chooseFile">选择文件上传</t-button>
-    <text class="upload-tip">建议一次上传不超过 10 份文件</text>
+    <t-button theme="primary" size="large" icon="upload" shape="round" bindtap="chooseFile">选择文件上传</t-button>
+    <text class="upload-tip">支持多文件上传，建议一次不超过 10 份</text>
     
     <!-- 上传队列 -->
     <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
       <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
-        <text class="upload-name">{{ item.name }}</text>
-        <text class="upload-status {{ item.status }}">{{ item.status === 'uploading' ? '上传中...' : item.status === 'success' ? '✓' : '✗' }}</text>
+        <view class="upload-info">
+          <t-icon name="file" size="32rpx" />
+          <text class="upload-name">{{ item.name }}</text>
+        </view>
+        <text class="upload-status {{ item.status }}">
+          <text wx:if="{{ item.status === 'uploading' }}">上传中...</text>
+          <text wx:elif="{{ item.status === 'success' }}">✓ 已完成</text>
+          <text wx:elif="{{ item.status === 'fail' }}">✗ 失败</text>
+        </text>
       </view>
     </view>
   </view>
@@ -33,10 +48,16 @@
   <view class="file-list-section card">
     <!-- 列表头部 -->
     <view class="list-header">
-      <text class="list-title">☁️ 存储桶文件列表</text>
+      <view class="list-title-area">
+        <t-icon name="folder-open" size="36rpx" />
+        <text class="list-title">存储桶文件</text>
+        <view class="file-count" wx:if="{{ fileList.length > 0 }}">{{ fileList.length }} 个文件</view>
+      </view>
       <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
-        <text class="selected-count">已选择 {{ selectedFiles.length }} 个</text>
-        <t-button theme="danger" size="small" icon="delete" bindtap="batchDelete">批量删除</t-button>
+        <view class="selected-badge">
+          <text>已选 {{ selectedFiles.length }}</text>
+        </view>
+        <t-button theme="danger" size="small" variant="outline" icon="delete" bindtap="batchDelete">批量删除</t-button>
       </view>
     </view>
 
@@ -59,14 +80,17 @@
             <t-checkbox checked="{{ selectedFiles.includes(item.key) }}" bindchange="toggleSelect" data-key="{{ item.key }}" />
           </view>
           <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
-            <text class="file-name">{{ item.name }}</text>
+            <view class="file-info">
+              <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="36rpx" />
+              <text class="file-name">{{ item.name }}</text>
+            </view>
           </view>
           <view class="td td-size">{{ formatSize(item.size) }}</view>
           <view class="td td-op">
             <view class="op-buttons">
-              <t-button theme="primary" size="small" variant="outline" icon="browse" bindtap="previewFile" data-file="{{ item }}">预览</t-button>
-              <t-button theme="success" size="small" variant="outline" icon="download" bindtap="downloadFile" data-file="{{ item }}">下载</t-button>
-              <t-button theme="danger" size="small" variant="outline" icon="delete" bindtap="deleteFile" data-file="{{ item }}">删除</t-button>
+              <t-button theme="primary" size="small" variant="text" icon="browse" bindtap="previewFile" data-file="{{ item }}">预览</t-button>
+              <t-button theme="success" size="small" variant="text" icon="download" bindtap="downloadFile" data-file="{{ item }}">下载</t-button>
+              <t-button theme="danger" size="small" variant="text" icon="delete" bindtap="deleteFile" data-file="{{ item }}">删除</t-button>
             </view>
           </view>
         </view>
@@ -75,20 +99,28 @@
 
     <!-- 空状态 -->
     <view wx:elif="{{ !listLoading }}" class="empty-state">
-      <text class="empty-icon">📂</text>
+      <view class="empty-icon-area">
+        <t-icon name="file-clear" size="120rpx" />
+      </view>
       <text class="empty-text">存储桶为空</text>
-      <t-button theme="primary" icon="refresh" bindtap="fetchFileList">刷新列表</t-button>
+      <text class="empty-hint">点击上方按钮上传文件</text>
+      <t-button theme="primary" variant="outline" icon="upload" bindtap="chooseFile">上传文件</t-button>
     </view>
 
     <!-- 加载状态 -->
     <view wx:else class="loading-state">
-      <text>加载中...</text>
+      <t-loading theme="circular" size="60rpx" />
+      <text class="loading-text">加载中...</text>
     </view>
 
     <!-- 分页 -->
     <view wx:if="{{ fileList.length > 0 }}" class="pagination">
       <t-button theme="default" size="small" variant="outline" icon="chevron-left" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</t-button>
-      <text class="page-info">{{ currentPage }} / {{ totalPages }}</text>
+      <view class="page-indicator">
+        <text class="page-current">{{ currentPage }}</text>
+        <text class="page-separator">/</text>
+        <text class="page-total">{{ totalPages }}</text>
+      </view>
       <t-button theme="default" size="small" variant="outline" icon="chevron-right" bindtap="nextPage" disabled="{{ currentPage >= totalPages }}">下一页</t-button>
     </view>
   </view>
