@@ -66,7 +66,7 @@
       <!-- 表头 -->
       <view class="table-header">
         <view class="th th-checkbox">
-          <t-checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" />
+          <checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" color="#0052d9" />
         </view>
         <view class="th th-name">文件名</view>
         <view class="th th-op">操作</view>
@@ -77,7 +77,7 @@
         <view wx:for="{{ paginatedFiles }}" wx:key="key" 
               class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ selectedFiles.includes(item.key) ? 'selected' : '' }}">
           <view class="td td-checkbox">
-            <t-checkbox checked="{{ selectedFiles.includes(item.key) }}" bindchange="toggleSelect" data-key="{{ item.key }}" />
+            <checkbox checked="{{ selectedFiles.includes(item.key) }}" bindchange="toggleSelect" data-key="{{ item.key }}" color="#0052d9" />
           </view>
           <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
             <view class="file-info">

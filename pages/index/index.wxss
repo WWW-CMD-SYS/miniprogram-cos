@@ -258,8 +258,14 @@
 }
 
 .th-checkbox, .td-checkbox {
-  width: 60rpx;
+  width: 70rpx;
   justify-content: center;
+}
+
+/* 原生checkbox样式 */
+.th-checkbox checkbox,
+.td-checkbox checkbox {
+  transform: scale(0.85);
 }
 
 .th-name, .td-name {
