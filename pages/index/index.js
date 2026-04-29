@@ -322,22 +322,36 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '正在删除...' });
 
-          try {
-            const result = await apiDeleteFiles(this.data.selectedFiles);
-            wx.hideLoading();
+          const keys = [...this.data.selectedFiles];
+          let successCount = 0;
+          let failCount = 0;
+          const errors = [];
 
-            if (result.code === 0) {
-              Toast({ message: `批量删除成功，共删除 ${this.data.selectedFiles.length} 个文件`, theme: 'success' });
-              this.setData({ selectedFiles: [] });
-              this.fetchFileList();
-            } else {
-              Toast({ message: result.message || '删除失败', theme: 'error' });
+          for (let i = 0; i < keys.length; i++) {
+            try {
+              const result = await apiDeleteFile(keys[i]);
+              if (result.code === 0) {
+                successCount++;
+              } else {
+                failCount++;
+                errors.push(result.message);
+              }
+            } catch (e) {
+              failCount++;
+              errors.push(e.message);
             }
-          } catch (e) {
-            wx.hideLoading();
-            console.error('批量删除失败:', e);
-            Toast({ message: '批量删除失败', theme: 'error' });
           }
+
+          wx.hideLoading();
+
+          if (failCount === 0) {
+            Toast({ message: `批量删除成功，共删除 ${successCount} 个文件`, theme: 'success' });
+          } else {
+            Toast({ message: `删除完成，成功 ${successCount} 个，失败 ${failCount} 个`, theme: failCount > successCount ? 'error' : 'warning' });
+          }
+
+          this.setData({ selectedFiles: [] });
+          this.fetchFileList();
         }
       }
     });
