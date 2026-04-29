@@ -76,6 +76,22 @@
   display: block;
 }
 
+/* 原生输入框样式 */
+.input-field {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  border-color: var(--primary-color);
+}
+
 /* TDesign 输入框样式覆盖 */
 .input {
   width: 100%;

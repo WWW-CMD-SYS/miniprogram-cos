@@ -15,7 +15,7 @@
     <!-- 创建存储桶链接 -->
     <view class="tip-section card">
       <view class="tip-link" bindtap="openCosConsole">
-        <t-icon name="link" size="40rpx" />
+        <t-icon name="jump" size="40rpx" />
         <text class="link-text">前往腾讯云创建存储桶</text>
       </view>
     </view>
@@ -24,60 +24,60 @@
     <view class="card">
       <view class="form-item">
         <text class="form-label">SecretId</text>
-        <t-input 
-          class="input" 
+        <input 
+          class="input-field" 
           type="text" 
           placeholder="请输入腾讯云 API SecretId"
           value="{{ formData.secretId }}"
-          bind:change="onInput" 
+          bindinput="onInput" 
           data-field="secretId"
         />
       </view>
 
       <view class="form-item">
         <text class="form-label">SecretKey</text>
-        <t-input 
-          class="input" 
+        <input 
+          class="input-field" 
           type="password" 
           placeholder="请输入腾讯云 API SecretKey"
           value="{{ formData.secretKey }}"
-          bind:change="onInput" 
+          bindinput="onInput" 
           data-field="secretKey"
         />
       </view>
 
       <view class="form-item">
         <text class="form-label">存储桶名称</text>
-        <t-input 
-          class="input" 
+        <input 
+          class="input-field" 
           type="text" 
           placeholder="如 my-bucket-1250000000"
           value="{{ formData.bucket }}"
-          bind:change="onInput" 
+          bindinput="onInput" 
           data-field="bucket"
         />
       </view>
 
       <view class="form-item">
         <text class="form-label">所属地域</text>
-        <t-input 
-          class="input" 
+        <input 
+          class="input-field" 
           type="text" 
           placeholder="如 ap-guangzhou"
           value="{{ formData.region }}"
-          bind:change="onInput" 
+          bindinput="onInput" 
           data-field="region"
         />
       </view>
 
       <view class="form-item">
         <text class="form-label">访问域名</text>
-        <t-input 
-          class="input" 
+        <input 
+          class="input-field" 
           type="text" 
           placeholder="可选，留空则自动生成"
           value="{{ formData.baseUrl }}"
-          bind:change="onInput" 
+          bindinput="onInput" 
           data-field="baseUrl"
         />
         <text class="form-tip">留空时系统将根据 Bucket 和 Region 自动生成访问地址</text>
