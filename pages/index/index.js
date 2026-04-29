@@ -71,15 +71,18 @@ Page({
   updateComputed() {
     const { fileList, selectedFiles, currentPage, pageSize } = this.data;
 
-    // 计算分页数据
+    // 计算分页数据，并给每个文件添加 selected 属性
     const totalPages = Math.max(1, Math.ceil(fileList.length / pageSize));
     const safePage = Math.min(currentPage, totalPages);
     const start = (safePage - 1) * pageSize;
     const end = start + pageSize;
-    const paginatedFiles = fileList.slice(start, end);
+    const paginatedFiles = fileList.slice(start, end).map(f => ({
+      ...f,
+      selected: selectedFiles.includes(f.key)
+    }));
 
     // 计算是否全选
-    const isAllSelected = paginatedFiles.length > 0 && paginatedFiles.every(f => selectedFiles.includes(f.key));
+    const isAllSelected = paginatedFiles.length > 0 && paginatedFiles.every(f => f.selected);
 
     this.setData({
       paginatedFiles,
