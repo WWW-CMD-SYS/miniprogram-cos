@@ -69,7 +69,6 @@
           <t-checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" />
         </view>
         <view class="th th-name">文件名</view>
-        <view class="th th-size">大小</view>
         <view class="th th-op">操作</view>
       </view>
 
@@ -82,16 +81,21 @@
           </view>
           <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
             <view class="file-info">
-              <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="36rpx" />
+              <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="40rpx" />
               <text class="file-name">{{ item.name }}</text>
             </view>
           </view>
-          <view class="td td-size">{{ formatSize(item.size) }}</view>
           <view class="td td-op">
-            <view class="op-buttons">
-              <t-button theme="primary" size="small" variant="text" icon="browse" bindtap="previewFile" data-file="{{ item }}">预览</t-button>
-              <t-button theme="success" size="small" variant="text" icon="download" bindtap="downloadFile" data-file="{{ item }}">下载</t-button>
-              <t-button theme="danger" size="small" variant="text" icon="delete" bindtap="deleteFile" data-file="{{ item }}">删除</t-button>
+            <view class="action-btns">
+              <view class="action-btn" catchtap="previewFile" data-file="{{ item }}" title="预览">
+                <t-icon name="browse" size="38rpx" color="#0052d9" />
+              </view>
+              <view class="action-btn" catchtap="downloadFile" data-file="{{ item }}" title="下载">
+                <t-icon name="download" size="38rpx" color="#00875a" />
+              </view>
+              <view class="action-btn action-btn-danger" catchtap="deleteFile" data-file="{{ item }}" title="删除">
+                <t-icon name="delete" size="38rpx" color="#d54941" />
+              </view>
             </view>
           </view>
         </view>

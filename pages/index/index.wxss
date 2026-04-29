@@ -267,22 +267,16 @@
   padding: 0 16rpx;
 }
 
-.th-size, .td-size {
-  width: 120rpx;
-  justify-content: center;
-  font-size: 24rpx;
-  color: var(--text-secondary);
-}
-
 .th-op, .td-op {
-  width: 340rpx;
+  width: 220rpx;
   justify-content: flex-end;
 }
 
+/* 文件信息 */
 .file-info {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
 .file-name {
@@ -292,11 +286,34 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-size: 26rpx;
 }
 
-.op-buttons {
+/* 图标操作按钮组 */
+.action-btns {
   display: flex;
-  gap: 4rpx;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.action-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.2s;
+}
+
+.action-btn:active {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(0.92);
+}
+
+.action-btn-danger:active {
+  background-color: rgba(213, 73, 65, 0.1);
 }
 
 /* ========== 空状态 ========== */
