@@ -1,7 +1,8 @@
 // pages/index/index.js
-import { loadConfig, hasConfig, getApiBaseUrl } from '../../utils/config';
+import { loadConfig, hasConfig } from '../../utils/config';
 import { listFiles, deleteFile as apiDeleteFile, deleteFiles as apiDeleteFiles, uploadFile } from '../../utils/cos';
 import { formatSize, getFileType } from '../../utils/format';
+import Toast from 'tdesign-miniprogram/toast/index';
 
 Page({
   data: {
@@ -15,12 +16,7 @@ Page({
     // 计算属性需要手动放在 data 中
     paginatedFiles: [],
     totalPages: 0,
-    isAllSelected: false,
-    toast: {
-      visible: false,
-      message: '',
-      theme: 'success'
-    }
+    isAllSelected: false
   },
 
   onLoad() {
@@ -28,7 +24,7 @@ Page({
     if (hasConfig()) {
       this.fetchFileList();
     } else {
-      this.showToast('请先配置 COS 参数', 'warning');
+      Toast({ message: '请先配置 COS 参数', theme: 'warning' });
       setTimeout(() => {
         this.openConfig();
       }, 500);
@@ -63,7 +59,7 @@ Page({
     const newDark = !this.data.isDark;
     this.setData({ isDark: newDark });
     this.applyTheme(newDark);
-    this.showToast(newDark ? '已切换到深色模式' : '已切换到浅色模式', 'success');
+    Toast({ message: newDark ? '已切换到深色模式' : '已切换到浅色模式', theme: 'success' });
   },
 
   // 打开配置页
@@ -96,7 +92,7 @@ Page({
   // 加载文件列表
   async fetchFileList() {
     if (!hasConfig()) {
-      this.showToast('请先配置 COS 参数', 'warning');
+      Toast({ message: '请先配置 COS 参数', theme: 'warning' });
       this.openConfig();
       return;
     }
@@ -112,13 +108,13 @@ Page({
           currentPage: 1
         });
         this.updateComputed();
-        this.showToast(`加载成功，共 ${res.data.files?.length || 0} 个文件`, 'success');
+        Toast({ message: `加载成功，共 ${res.data.files?.length || 0} 个文件`, theme: 'success' });
       } else {
-        this.showToast(res.message || '获取列表失败', 'error');
+        Toast({ message: res.message || '获取列表失败', theme: 'error' });
       }
     } catch (e) {
       console.error('获取文件列表失败:', e);
-      this.showToast('网络请求失败，请检查后端服务是否运行', 'error');
+      Toast({ message: '网络请求失败，请检查后端服务是否运行', theme: 'error' });
     }
 
     this.setData({ listLoading: false });
@@ -186,7 +182,7 @@ Page({
   previewFile(e) {
     const file = e.currentTarget.dataset.file;
     if (!file.url) {
-      this.showToast('文件 URL 不存在', 'error');
+      Toast({ message: '文件 URL 不存在', theme: 'error' });
       return;
     }
 
@@ -208,17 +204,17 @@ Page({
               filePath: res.tempFilePath,
               showMenu: true,
               success: () => {
-                this.showToast('打开成功', 'success');
+                Toast({ message: '打开成功', theme: 'success' });
               },
               fail: () => {
-                this.showToast('打开失败', 'error');
+                Toast({ message: '打开失败', theme: 'error' });
               }
             });
           }
         },
         fail: () => {
           wx.hideLoading();
-          this.showToast('下载失败', 'error');
+          Toast({ message: '下载失败', theme: 'error' });
         }
       });
     } else {
@@ -230,7 +226,7 @@ Page({
   downloadFile(e) {
     const file = e.currentTarget.dataset.file;
     if (!file.url) {
-      this.showToast('文件 URL 不存在', 'error');
+      Toast({ message: '文件 URL 不存在', theme: 'error' });
       return;
     }
 
@@ -248,14 +244,14 @@ Page({
             wx.saveImageToPhotosAlbum({
               filePath: tempPath,
               success: () => {
-                this.showToast(`已保存 ${file.name} 到相册`, 'success');
+                Toast({ message: `已保存 ${file.name} 到相册`, theme: 'success' });
               },
               fail: (err) => {
                 if (err.errMsg.includes('auth deny')) {
-                  this.showToast('请授权保存图片到相册', 'warning');
+                  Toast({ message: '请授权保存图片到相册', theme: 'warning' });
                   wx.openSetting();
                 } else {
-                  this.showToast('保存失败', 'error');
+                  Toast({ message: '保存失败', theme: 'error' });
                 }
               }
             });
@@ -264,20 +260,20 @@ Page({
               filePath: tempPath,
               showMenu: true,
               success: () => {
-                this.showToast('打开成功', 'success');
+                Toast({ message: '打开成功', theme: 'success' });
               },
               fail: () => {
-                this.showToast('打开失败', 'error');
+                Toast({ message: '打开失败', theme: 'error' });
               }
             });
           }
         } else {
-          this.showToast('下载失败', 'error');
+          Toast({ message: '下载失败', theme: 'error' });
         }
       },
       fail: () => {
         wx.hideLoading();
-        this.showToast('下载失败', 'error');
+        Toast({ message: '下载失败', theme: 'error' });
       }
     });
   },
@@ -294,14 +290,14 @@ Page({
           try {
             const result = await apiDeleteFile(file.key);
             if (result.code === 0) {
-              this.showToast('删除成功', 'success');
+              Toast({ message: '删除成功', theme: 'success' });
               this.fetchFileList();
             } else {
-              this.showToast(result.message || '删除失败', 'error');
+              Toast({ message: result.message || '删除失败', theme: 'error' });
             }
           } catch (e) {
             console.error('删除失败:', e);
-            this.showToast('删除失败', 'error');
+            Toast({ message: '删除失败', theme: 'error' });
           }
         }
       }
@@ -311,7 +307,7 @@ Page({
   // 批量删除
   batchDelete() {
     if (this.data.selectedFiles.length === 0) {
-      this.showToast('请先选择要删除的文件', 'warning');
+      Toast({ message: '请先选择要删除的文件', theme: 'warning' });
       return;
     }
 
@@ -328,16 +324,16 @@ Page({
             wx.hideLoading();
 
             if (result.code === 0) {
-              this.showToast(`批量删除成功，共删除 ${this.data.selectedFiles.length} 个文件`, 'success');
+              Toast({ message: `批量删除成功，共删除 ${this.data.selectedFiles.length} 个文件`, theme: 'success' });
               this.setData({ selectedFiles: [] });
               this.fetchFileList();
             } else {
-              this.showToast(result.message || '删除失败', 'error');
+              Toast({ message: result.message || '删除失败', theme: 'error' });
             }
           } catch (e) {
             wx.hideLoading();
             console.error('批量删除失败:', e);
-            this.showToast('批量删除失败', 'error');
+            Toast({ message: '批量删除失败', theme: 'error' });
           }
         }
       }
@@ -347,7 +343,7 @@ Page({
   // 选择文件上传
   chooseFile() {
     if (!hasConfig()) {
-      this.showToast('请先配置 COS 参数', 'warning');
+      Toast({ message: '请先配置 COS 参数', theme: 'warning' });
       this.openConfig();
       return;
     }
@@ -392,14 +388,14 @@ Page({
           [`uploadQueue[${i}].status`]: 'success',
           [`uploadQueue[${i}].progress`]: 100
         });
-        this.showToast(`${file.name} 上传成功`, 'success');
+        Toast({ message: `${file.name} 上传成功`, theme: 'success' });
 
       } catch (e) {
         console.error(`上传 ${file.name} 失败:`, e);
         this.setData({
           [`uploadQueue[${i}].status`]: 'fail'
         });
-        this.showToast(`${file.name} 上传失败`, 'error');
+        Toast({ message: `${file.name} 上传失败`, theme: 'error' });
       }
     }
 
@@ -407,22 +403,5 @@ Page({
       this.setData({ uploadQueue: [] });
       this.fetchFileList();
     }, 1500);
-  },
-
-  // 显示 Toast
-  showToast(message, theme = 'success') {
-    this.setData({
-      toast: {
-        visible: true,
-        message,
-        theme
-      }
-    });
-
-    setTimeout(() => {
-      this.setData({
-        'toast.visible': false
-      });
-    }, 2000);
   }
 });

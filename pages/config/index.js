@@ -1,6 +1,7 @@
 // pages/config/index.js
-import { loadConfig, saveConfig as saveConfigUtil, clearConfig, getApiBaseUrl } from '../../utils/config';
+import { loadConfig, saveConfig as saveConfigUtil, clearConfig } from '../../utils/config';
 import { validateConfig } from '../../utils/cos';
+import Toast from 'tdesign-miniprogram/toast/index';
 
 Page({
   data: {
@@ -11,12 +12,7 @@ Page({
       region: '',
       baseUrl: ''
     },
-    saving: false,
-    toast: {
-      visible: false,
-      message: '',
-      theme: 'success'
-    }
+    saving: false
   },
 
   onLoad() {
@@ -39,7 +35,7 @@ Page({
     }
   },
 
-  // 输入处理
+  // 输入处理 - TDesign t-input 使用 bind:change
   onInput(e) {
     const field = e.currentTarget.dataset.field;
     const value = e.detail.value;
@@ -53,11 +49,7 @@ Page({
     wx.setClipboardData({
       data: 'https://console.cloud.tencent.com/cos',
       success: () => {
-        wx.showModal({
-          title: '提示',
-          content: '链接已复制，请在浏览器中打开',
-          showCancel: false
-        });
+        Toast({ message: '链接已复制，请在浏览器中打开', theme: 'success' });
       }
     });
   },
@@ -73,19 +65,19 @@ Page({
 
     // 简单验证
     if (!secretId) {
-      this.showToast('SecretId 不能为空', 'error');
+      Toast({ message: 'SecretId 不能为空', theme: 'error' });
       return;
     }
     if (!secretKey) {
-      this.showToast('SecretKey 不能为空', 'error');
+      Toast({ message: 'SecretKey 不能为空', theme: 'error' });
       return;
     }
     if (!bucket) {
-      this.showToast('Bucket 不能为空', 'error');
+      Toast({ message: 'Bucket 不能为空', theme: 'error' });
       return;
     }
     if (!region) {
-      this.showToast('Region 不能为空', 'error');
+      Toast({ message: 'Region 不能为空', theme: 'error' });
       return;
     }
 
@@ -99,41 +91,24 @@ Page({
       const res = await validateConfig();
 
       if (res.code === 0) {
-        this.showToast('配置保存并验证成功', 'success');
+        Toast({ message: '配置保存并验证成功', theme: 'success' });
         setTimeout(() => {
           this.goBack();
         }, 1000);
       } else {
         // 验证失败，清除配置
         clearConfig();
-        this.showToast(res.message || '配置验证失败', 'error');
+        Toast({ message: res.message || '配置验证失败', theme: 'error' });
       }
     } catch (e) {
       console.error('保存配置出错:', e);
       // 网络错误时保留本地配置
-      this.showToast('配置已保存（验证请求失败，请检查后端服务）', 'warning');
+      Toast({ message: '配置已保存（验证请求失败，请检查后端服务）', theme: 'warning' });
       setTimeout(() => {
         this.goBack();
       }, 1500);
     }
 
     this.setData({ saving: false });
-  },
-
-  // 显示 Toast
-  showToast(message, theme = 'success') {
-    this.setData({
-      toast: {
-        visible: true,
-        message,
-        theme
-      }
-    });
-
-    setTimeout(() => {
-      this.setData({
-        'toast.visible': false
-      });
-    }, 2500);
   }
 });

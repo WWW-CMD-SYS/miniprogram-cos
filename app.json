@@ -16,5 +16,12 @@
     "scope.writePhotosAlbum": {
       "desc": "用于保存下载的文件到相册"
     }
+  },
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-checkbox": "tdesign-miniprogram/checkbox/checkbox",
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-dialog": "tdesign-miniprogram/dialog/dialog"
   }
 }
