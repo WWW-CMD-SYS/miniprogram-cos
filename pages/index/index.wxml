@@ -12,9 +12,6 @@
         </view>
       </view>
       <view class="header-actions">
-        <view class="theme-btn" bindtap="toggleTheme">
-          <t-icon name="{{ isDark ? 'sun' : 'moon' }}" size="40rpx" />
-        </view>
         <view class="btn-group">
           <t-button size="small" theme="light" variant="outline" icon="setting" bindtap="openConfig">配置</t-button>
           <t-button size="small" theme="primary" icon="refresh" loading="{{ listLoading }}" bindtap="fetchFileList">刷新</t-button>
