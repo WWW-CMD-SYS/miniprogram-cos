@@ -65,7 +65,7 @@
     <view wx:if="{{ fileList.length > 0 }}" class="file-table">
       <!-- 表头 -->
       <view class="table-header">
-        <view class="th th-checkbox" catchtap="toggleSelectAll">
+        <view class="th th-checkbox" bindtap="toggleSelectAll">
           <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ isAllSelected ? '#0052d9' : '#999' }}" />
         </view>
         <view class="th th-name">文件名</view>
@@ -76,7 +76,7 @@
       <scroll-view scroll-y class="table-body">
         <view wx:for="{{ paginatedFiles }}" wx:key="key" 
               class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ selectedFiles.includes(item.key) ? 'selected' : '' }}">
-          <view class="td td-checkbox" catchtap="toggleSelect" data-key="{{ item.key }}">
+          <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
             <t-icon name="{{ selectedFiles.includes(item.key) ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ selectedFiles.includes(item.key) ? '#0052d9' : '#999' }}" />
           </view>
           <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
