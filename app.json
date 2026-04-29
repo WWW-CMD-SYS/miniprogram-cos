@@ -22,6 +22,11 @@
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-checkbox": "tdesign-miniprogram/checkbox/checkbox",
     "t-toast": "tdesign-miniprogram/toast/toast",
-    "t-dialog": "tdesign-miniprogram/dialog/dialog"
+    "t-dialog": "tdesign-miniprogram/dialog/dialog",
+    "t-table": "tdesign-miniprogram/table/table",
+    "t-tr": "tdesign-miniprogram/table/tr/tr",
+    "t-th": "tdesign-miniprogram/table/th/th",
+    "t-td": "tdesign-miniprogram/table/td/td",
+    "t-loading": "tdesign-miniprogram/loading/loading"
   }
 }
