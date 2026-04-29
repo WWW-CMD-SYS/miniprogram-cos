@@ -1,0 +1,97 @@
+<view class="page-container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="header-left">
+        <text class="title">📁 腾讯云COS文件管理器</text>
+      </view>
+      <view class="header-actions">
+        <button class="btn btn-default btn-small" bindtap="openConfig">⚙️ 配置</button>
+        <button class="btn btn-primary btn-small" bindtap="fetchFileList" loading="{{ listLoading }}">🔄 刷新</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 文件上传区 -->
+  <view class="upload-section card">
+    <button class="btn btn-primary" bindtap="chooseFile">📤 选择文件上传</button>
+    <text class="upload-tip">建议一次上传不超过 10 份文件</text>
+    
+    <!-- 上传队列 -->
+    <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
+      <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
+        <text class="upload-name">{{ item.name }}</text>
+        <text class="upload-status {{ item.status }}">{{ item.status === 'uploading' ? '上传中...' : item.status === 'success' ? '✓' : '✗' }}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 文件列表 -->
+  <view class="file-list-section card">
+    <!-- 列表头部 -->
+    <view class="list-header">
+      <text class="list-title">☁️ 存储桶文件列表</text>
+      <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
+        <text class="selected-count">已选择 {{ selectedFiles.length }} 个</text>
+        <button class="btn btn-danger btn-small" bindtap="batchDelete">🗑️ 批量删除</button>
+      </view>
+    </view>
+
+    <!-- 文件表格 -->
+    <view wx:if="{{ fileList.length > 0 }}" class="file-table">
+      <!-- 表头 -->
+      <view class="table-header">
+        <view class="th th-checkbox">
+          <checkbox checked="{{ isAllSelected }}" bindchange="toggleSelectAll" />
+        </view>
+        <view class="th th-name">文件名</view>
+        <view class="th th-size">大小</view>
+        <view class="th th-op">操作</view>
+      </view>
+
+      <!-- 表体 -->
+      <scroll-view scroll-y class="table-body">
+        <view wx:for="{{ paginatedFiles }}" wx:key="key" class="table-row {{ selectedFiles.includes(item.key) ? 'selected' : '' }}">
+          <view class="td td-checkbox">
+            <checkbox checked="{{ selectedFiles.includes(item.key) }}" bindchange="toggleSelect" data-key="{{ item.key }}" />
+          </view>
+          <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
+            <text class="file-name">{{ item.name }}</text>
+          </view>
+          <view class="td td-size">{{ formatSize(item.size) }}</view>
+          <view class="td td-op">
+            <view class="op-buttons">
+              <button class="btn btn-primary btn-outline btn-small" bindtap="previewFile" data-file="{{ item }}">预览</button>
+              <button class="btn btn-success btn-outline btn-small" bindtap="downloadFile" data-file="{{ item }}">下载</button>
+              <button class="btn btn-danger btn-outline btn-small" bindtap="deleteFile" data-file="{{ item }}">删除</button>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:elif="{{ !listLoading }}" class="empty-state">
+      <text class="empty-icon">📂</text>
+      <text class="empty-text">存储桶为空</text>
+      <button class="btn btn-primary" bindtap="fetchFileList">刷新列表</button>
+    </view>
+
+    <!-- 加载状态 -->
+    <view wx:else class="loading-state">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 分页 -->
+    <view wx:if="{{ fileList.length > 0 }}" class="pagination">
+      <button class="btn btn-default btn-small" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</button>
+      <text class="page-info">{{ currentPage }} / {{ totalPages }}</text>
+      <button class="btn btn-default btn-small" bindtap="nextPage" disabled="{{ currentPage >= totalPages }}">下一页</button>
+    </view>
+  </view>
+
+  <!-- Toast -->
+  <view wx:if="{{ toast.visible }}" class="toast toast-{{ toast.theme }}">
+    <text>{{ toast.message }}</text>
+  </view>
+</view>

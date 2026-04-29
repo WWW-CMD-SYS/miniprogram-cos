@@ -1,0 +1,88 @@
+<view class="detail-page">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="back-btn" bindtap="goBack">
+        <text>← 返回</text>
+      </view>
+      <text class="header-title">文件详情</text>
+      <view style="width: 120rpx;"></view>
+    </view>
+  </view>
+
+  <!-- 文件信息 -->
+  <view class="content">
+    <!-- 预览区域 -->
+    <view class="preview-area card">
+      <view wx:if="{{ loading }}" class="preview-loading">
+        <text>加载中...</text>
+      </view>
+      <!-- 图片预览 -->
+      <image
+        wx:elif="{{ fileType === 'image' }}"
+        :src="{{ fileInfo.url }}"
+        class="preview-image"
+        mode="aspectFit"
+        bindtap="previewImage"
+        src="{{ fileInfo.url }}"
+      />
+      <!-- 文本预览 -->
+      <scroll-view
+        wx:elif="{{ fileType === 'text' }}"
+        scroll-y
+        class="preview-text"
+      >
+        <text>{{ textContent }}</text>
+      </scroll-view>
+      <!-- 不支持预览 -->
+      <view wx:else class="preview-unsupported">
+        <text class="unsupported-icon">📄</text>
+        <text class="unsupported-text">此文件类型不支持预览</text>
+      </view>
+    </view>
+
+    <!-- 文件信息卡片 -->
+    <view class="info-card card">
+      <view class="info-title">📋 文件信息</view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">文件名</text>
+          <text class="info-value">{{ fileInfo.name }}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">文件大小</text>
+          <text class="info-value">{{ formatSize(fileInfo.size) }}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">存储类型</text>
+          <view class="tag tag-{{ getStorageTheme(fileInfo.storageClass) }}">
+            <text>{{ getStorageText(fileInfo.storageClass) }}</text>
+          </view>
+        </view>
+        <view class="info-item">
+          <text class="info-label">修改时间</text>
+          <text class="info-value">{{ formatDate(fileInfo.lastModified) }}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">文件路径</text>
+          <text class="info-value path-value">{{ fileInfo.key }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="btn btn-primary btn-block" bindtap="downloadFile">
+        📥 下载文件
+      </button>
+      <button class="btn btn-danger btn-block" bindtap="confirmDelete">
+        🗑️ 删除文件
+      </button>
+    </view>
+  </view>
+
+  <!-- Toast -->
+  <view wx:if="{{ toast.visible }}" class="toast toast-{{ toast.theme }}">
+    <text>{{ toast.message }}</text>
+  </view>
+</view>

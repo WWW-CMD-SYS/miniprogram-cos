@@ -1,0 +1,121 @@
+<view class="config-page">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="back-btn" bindtap="goBack">
+        <text>← 返回</text>
+      </view>
+      <text class="header-title">⚙️ COS 配置</text>
+      <view style="width: 120rpx;"></view>
+    </view>
+  </view>
+
+  <!-- 表单内容 -->
+  <view class="form-container">
+    <!-- 创建存储桶链接 -->
+    <view class="tip-section card">
+      <view class="tip-link" bindtap="openCosConsole">
+        <text class="link-icon">🔗</text>
+        <text class="link-text">前往腾讯云创建存储桶</text>
+      </view>
+    </view>
+
+    <!-- 配置表单 -->
+    <view class="card">
+      <view class="form-item">
+        <text class="form-label">SecretId</text>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="请输入腾讯云 API SecretId"
+          value="{{ formData.secretId }}"
+          bindinput="onInput" 
+          data-field="secretId"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">SecretKey</text>
+        <input 
+          class="input" 
+          type="password" 
+          placeholder="请输入腾讯云 API SecretKey"
+          value="{{ formData.secretKey }}"
+          bindinput="onInput" 
+          data-field="secretKey"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">存储桶名称</text>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="如 my-bucket-1250000000"
+          value="{{ formData.bucket }}"
+          bindinput="onInput" 
+          data-field="bucket"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">所属地域</text>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="如 ap-guangzhou"
+          value="{{ formData.region }}"
+          bindinput="onInput" 
+          data-field="region"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">访问域名</text>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="可选，留空则自动生成"
+          value="{{ formData.baseUrl }}"
+          bindinput="onInput" 
+          data-field="baseUrl"
+        />
+        <text class="form-tip">留空时系统将根据 Bucket 和 Region 自动生成访问地址</text>
+      </view>
+
+      <!-- 按钮区域 -->
+      <view class="button-group">
+        <button class="btn btn-default" bindtap="goBack" disabled="{{ saving }}">取消</button>
+        <button class="btn btn-primary" bindtap="saveConfig" loading="{{ saving }}">保存配置</button>
+      </view>
+    </view>
+
+    <!-- 帮助说明 -->
+    <view class="help-section card">
+      <view class="help-title">📖 配置说明</view>
+      <view class="help-content">
+        <view class="help-item">
+          <text class="help-label">SecretId / SecretKey</text>
+          <text class="help-desc">前往腾讯云控制台 → 访问管理 → API 密钥管理 获取</text>
+        </view>
+        <view class="help-item">
+          <text class="help-label">存储桶名称</text>
+          <text class="help-desc">格式：bucket-appid，如 my-bucket-1250000000</text>
+        </view>
+        <view class="help-item">
+          <text class="help-label">所属地域</text>
+          <text class="help-desc">存储桶所在地域，如 ap-guangzhou（广州）、ap-shanghai（上海）</text>
+        </view>
+        <view class="help-item">
+          <text class="help-label">访问域名</text>
+          <text class="help-desc">可选配置，用于自定义域名访问</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Toast -->
+  <view wx:if="{{ toast.visible }}" class="toast toast-{{ toast.theme }}">
+    <text>{{ toast.message }}</text>
+  </view>
+</view>

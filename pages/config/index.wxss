@@ -1,0 +1,177 @@
+.config-page {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+/* 头部样式 */
+.header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #003a94 100%);
+  color: #ffffff;
+  padding: 24rpx 32rpx;
+  padding-top: calc(env(safe-area-inset-top) + 24rpx);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-btn {
+  width: 120rpx;
+  font-size: 28rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+/* 表单容器 */
+.form-container {
+  padding: 24rpx;
+}
+
+/* 提示区域 */
+.tip-section {
+  margin-bottom: 24rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.tip-link {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: var(--danger-color);
+  font-size: 28rpx;
+}
+
+.link-icon {
+  font-size: 32rpx;
+}
+
+.link-text {
+  text-decoration: underline;
+}
+
+/* 表单 */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+  font-weight: 500;
+  display: block;
+}
+
+.input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+}
+
+.form-tip {
+  font-size: 22rpx;
+  color: var(--text-placeholder);
+  margin-top: 8rpx;
+  display: block;
+  line-height: 1.4;
+}
+
+/* 按钮组 */
+.button-group {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 32rpx;
+}
+
+.button-group .btn {
+  flex: 1;
+}
+
+/* 帮助说明 */
+.help-section {
+  padding: 24rpx;
+}
+
+.help-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.help-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.help-label {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.help-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 24rpx 48rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  z-index: 9999;
+  opacity: 0.9;
+}
+
+.toast-success {
+  background-color: var(--success-color);
+  color: #ffffff;
+}
+
+.toast-warning {
+  background-color: var(--warning-color);
+  color: #ffffff;
+}
+
+.toast-error {
+  background-color: var(--danger-color);
+  color: #ffffff;
+}

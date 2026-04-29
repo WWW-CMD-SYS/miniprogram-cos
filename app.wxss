@@ -1,0 +1,232 @@
+/* 全局样式变量 */
+page {
+  --primary-color: #0052d9;
+  --success-color: #00a870;
+  --warning-color: #e37318;
+  --danger-color: #d54941;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-placeholder: #999999;
+  --border-color: #e5e5e5;
+  --bg-color: #f5f5f5;
+  --card-bg: #ffffff;
+  --header-bg: #0052d9;
+  --header-text: #ffffff;
+  --link-color: #0052d9;
+}
+
+/* 深色模式 */
+page[data-theme="dark"] {
+  --primary-color: #4d9fff;
+  --success-color: #00d58a;
+  --warning-color: #ff9f43;
+  --danger-color: #ff6b6b;
+  --text-primary: #ffffff;
+  --text-secondary: #bbbbbb;
+  --text-placeholder: #888888;
+  --border-color: #3d3d3d;
+  --bg-color: #1a1a1a;
+  --card-bg: #262626;
+  --header-bg: #1a1a1a;
+  --header-text: #ffffff;
+  --link-color: #4d9fff;
+}
+
+page {
+  background-color: var(--bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* 通用容器 */
+.container {
+  padding: 24rpx;
+  min-height: 100vh;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 16rpx 32rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-default {
+  background-color: #ffffff;
+  color: var(--text-primary);
+  border: 1rpx solid var(--border-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #ffffff;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: #ffffff;
+}
+
+.btn-small {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+}
+
+.btn-outline {
+  background-color: transparent !important;
+  border: 1rpx solid currentColor !important;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 22rpx;
+}
+
+.tag-primary {
+  background-color: rgba(0, 82, 217, 0.1);
+  color: var(--primary-color);
+}
+
+.tag-warning {
+  background-color: rgba(227, 115, 24, 0.1);
+  color: var(--warning-color);
+}
+
+.tag-danger {
+  background-color: rgba(213, 73, 65, 0.1);
+  color: var(--danger-color);
+}
+
+.tag-success {
+  background-color: rgba(0, 168, 112, 0.1);
+  color: var(--success-color);
+}
+
+.tag-default {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+}
+
+/* 加载提示 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+}
+
+.loading-text {
+  color: var(--text-placeholder);
+  font-size: 26rpx;
+  margin-left: 16rpx;
+}
+
+/* 空状态 */
+.empty-tip {
+  padding: 120rpx 0;
+  text-align: center;
+  color: var(--text-placeholder);
+}
+
+/* 链接样式 */
+.link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+/* 输入框样式 */
+.input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+/* 表单项 */
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+  font-weight: 500;
+  display: block;
+}
+
+.form-tip {
+  font-size: 22rpx;
+  color: var(--text-placeholder);
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 工具类 */
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-primary { color: var(--primary-color); }
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+.text-danger { color: var(--danger-color); }
+
+/* 单元格 */
+.cell {
+  background-color: var(--card-bg);
+  padding: 24rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.cell-title {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.cell-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
