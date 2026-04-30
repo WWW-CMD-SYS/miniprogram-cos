@@ -28,7 +28,6 @@ miniprogram-3/
 │   ├── config.js       # COS 配置管理
 │   ├── cos.js          # COS API 请求
 │   └── format.js       # 格式化工具
-├── styles/             # 样式文件（可选）
 └── project.config.json # 项目配置
 ```
 
