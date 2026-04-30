@@ -102,44 +102,114 @@
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
 }
 
 .info-item {
   display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.info-item:last-child {
+  border-bottom: none;
 }
 
 .info-label {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: var(--text-placeholder);
+  flex-shrink: 0;
+  margin-right: 24rpx;
+  line-height: 1.5;
 }
 
 .info-value {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: var(--text-primary);
   word-break: break-all;
+  text-align: right;
+  flex: 1;
+  line-height: 1.5;
 }
 
 .path-value {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-family: monospace;
   background-color: var(--bg-color);
-  padding: 12rpx;
+  padding: 12rpx 16rpx;
   border-radius: 8rpx;
+  text-align: left;
+}
+
+/* 文件路径项特殊布局 */
+.info-item-path {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.info-item-path .info-label {
+  margin-bottom: 12rpx;
+}
+
+.info-item-path .info-value {
+  width: 100%;
+  text-align: left;
+}
+
+/* 存储类型标签 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.tag-primary {
+  background-color: rgba(0, 82, 217, 0.1);
+  color: #0052d9;
+}
+
+.tag-warning {
+  background-color: rgba(255, 158, 0, 0.1);
+  color: #ff9e00;
+}
+
+.tag-success {
+  background-color: rgba(0, 168, 84, 0.1);
+  color: #00a854;
+}
+
+.tag-default {
+  background-color: rgba(153, 153, 153, 0.1);
+  color: #666;
+}
+
+.tag-danger {
+  background-color: rgba(227, 77, 89, 0.1);
+  color: #e34d59;
 }
 
 /* 操作按钮 */
 .action-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 24rpx;
-  margin-top: 32rpx;
+  margin-top: 40rpx;
+  padding: 0 8rpx;
 }
 
-.btn-block {
-  width: 100%;
+.action-buttons t-button {
+  flex: 1;
+  --td-button-primary-bg-color: linear-gradient(135deg, #0052d9 0%, #003bb3 100%);
+  --td-button-primary-active-bg-color: linear-gradient(135deg, #0041b3 0%, #002d80 100%);
+  --td-button-danger-bg-color: linear-gradient(135deg, #e34d59 0%, #c9353f 100%);
+  --td-button-danger-active-bg-color: linear-gradient(135deg, #c9353f 0%, #a02830 100%);
+  --td-button-border-radius: 12rpx;
+  --td-button-font-weight: 500;
 }
 
 /* Toast */

@@ -8,6 +8,11 @@ Page({
     fileType: '',
     textContent: '',
     loading: false,
+    // 格式化后的显示数据
+    displaySize: '-',
+    displayDate: '-',
+    displayStorageText: '-',
+    displayStorageTheme: 'default',
     toast: {
       visible: false,
       message: '',
@@ -20,12 +25,25 @@ Page({
       const fileStr = decodeURIComponent(options.file);
       const fileInfo = JSON.parse(fileStr);
       this.setData({ fileInfo });
-      
+
+      // 预处理格式化数据
+      this.prepareDisplayData(fileInfo);
+
       this.initFile();
     } catch (e) {
       console.error('解析文件信息失败:', e);
       this.showToast('文件信息解析失败', 'error');
     }
+  },
+
+  // 预处理显示数据
+  prepareDisplayData(fileInfo) {
+    this.setData({
+      displaySize: formatSize(fileInfo.size),
+      displayDate: formatDate(fileInfo.lastModified),
+      displayStorageText: getStorageText(fileInfo.storageClass),
+      displayStorageTheme: getStorageTheme(fileInfo.storageClass)
+    });
   },
 
   // 初始化文件预览
@@ -140,10 +158,10 @@ Page({
           try {
             const result = await apiDeleteFile(this.data.fileInfo.key);
             if (result.code === 0) {
-              this.showToast('删除成功', 'success');
-              setTimeout(() => {
-                this.goBack();
-              }, 1000);
+              // 刷新列表页面
+              this.refreshListPage();
+              // 立即返回列表页面
+              this.goBack();
             } else {
               this.showToast(result.message || '删除失败', 'error');
             }
@@ -155,21 +173,14 @@ Page({
     });
   },
 
-  // 格式化函数（暴露给 wxml）
-  formatSize(size) {
-    return formatSize(size);
-  },
-
-  formatDate(dateStr) {
-    return formatDate(dateStr);
-  },
-
-  getStorageText(storageClass) {
-    return getStorageText(storageClass);
-  },
-
-  getStorageTheme(storageClass) {
-    return getStorageTheme(storageClass);
+  // 刷新列表页面
+  refreshListPage() {
+    const pages = getCurrentPages();
+    // 查找列表页面（index 页面）
+    const listPage = pages.find(p => p.route === 'pages/index/index');
+    if (listPage && typeof listPage.fetchFileList === 'function') {
+      listPage.fetchFileList();
+    }
   },
 
   // 显示 Toast

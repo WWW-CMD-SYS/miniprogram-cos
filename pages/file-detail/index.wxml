@@ -51,19 +51,19 @@
         </view>
         <view class="info-item">
           <text class="info-label">文件大小</text>
-          <text class="info-value">{{ formatSize(fileInfo.size) }}</text>
+          <text class="info-value">{{ displaySize }}</text>
         </view>
         <view class="info-item">
           <text class="info-label">存储类型</text>
-          <view class="tag tag-{{ getStorageTheme(fileInfo.storageClass) }}">
-            <text>{{ getStorageText(fileInfo.storageClass) }}</text>
+          <view class="tag tag-{{ displayStorageTheme }}">
+            <text>{{ displayStorageText }}</text>
           </view>
         </view>
         <view class="info-item">
           <text class="info-label">修改时间</text>
-          <text class="info-value">{{ formatDate(fileInfo.lastModified) }}</text>
+          <text class="info-value">{{ displayDate }}</text>
         </view>
-        <view class="info-item">
+        <view class="info-item info-item-path">
           <text class="info-label">文件路径</text>
           <text class="info-value path-value">{{ fileInfo.key }}</text>
         </view>
@@ -72,12 +72,12 @@
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
-      <button class="btn btn-primary btn-block" bindtap="downloadFile">
-        📥 下载文件
-      </button>
-      <button class="btn btn-danger btn-block" bindtap="confirmDelete">
-        🗑️ 删除文件
-      </button>
+      <t-button theme="danger" size="medium" block bind:tap="confirmDelete" icon="delete">
+        删除文件
+      </t-button>
+      <t-button theme="primary" size="medium" block bind:tap="downloadFile" icon="cloud-download">
+        下载文件
+      </t-button>
     </view>
   </view>
 

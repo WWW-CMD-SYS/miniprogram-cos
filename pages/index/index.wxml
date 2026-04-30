@@ -7,14 +7,20 @@
           <view class="logo-icon">☁️</view>
           <view class="title-area">
             <text class="title">COS 文件管理器</text>
-            <text class="subtitle">腾讯云对象存储</text>
+            <text class="subtitle">wuxiaojie个人使用版</text>
           </view>
         </view>
       </view>
       <view class="header-actions">
-        <view class="btn-group">
-          <t-button size="small" theme="light" variant="outline" icon="setting" bindtap="openConfig">配置</t-button>
-          <t-button size="small" theme="primary" icon="refresh" loading="{{ listLoading }}" bindtap="fetchFileList">刷新</t-button>
+        <view class="action-btn-group">
+          <view class="action-btn-item" bindtap="openConfig">
+            <t-icon name="setting" size="32rpx" color="#ffffff" />
+            <text class="action-btn-text">配置</text>
+          </view>
+          <view class="action-btn-item action-btn-primary" bindtap="fetchFileList">
+            <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
+            <text class="action-btn-text">刷新</text>
+          </view>
         </view>
       </view>
     </view>
@@ -22,9 +28,15 @@
 
   <!-- 文件上传区 -->
   <view class="upload-section card">
-    <t-button theme="primary" size="large" icon="upload" shape="round" bindtap="chooseFile">选择文件上传</t-button>
-    <text class="upload-tip">支持多文件上传，建议一次不超过 10 份</text>
-    
+    <view class="upload-btn-gradient" bindtap="chooseFile">
+      <view class="upload-btn-content">
+        <t-icon name="upload" size="36rpx" color="#ffffff" />
+        <text class="upload-btn-text">选择文件上传</text>
+      </view>
+    </view>
+    <text class="upload-tip">支持多文件上传，建议一次不超过 10 份
+    </text>
+
     <!-- 上传队列 -->
     <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
       <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
@@ -71,8 +83,7 @@
 
       <!-- 表体 -->
       <scroll-view scroll-y class="table-body">
-        <view wx:for="{{ paginatedFiles }}" wx:key="key" 
-              class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ item.selected ? 'selected' : '' }}">
+        <view wx:for="{{ paginatedFiles }}" wx:key="key" class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ item.selected ? 'selected' : '' }}">
           <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
             <t-icon name="{{ item.selected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ item.selected ? '#0052d9' : '#999' }}" />
           </view>
@@ -117,13 +128,13 @@
 
     <!-- 分页 -->
     <view wx:if="{{ fileList.length > 0 }}" class="pagination">
-      <t-button theme="default" size="small" variant="outline" icon="chevron-left" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</t-button>
+      <t-button size="large" theme="primary" variant="outline" icon="chevron-left" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</t-button>
       <view class="page-indicator">
         <text class="page-current">{{ currentPage }}</text>
         <text class="page-separator">/</text>
         <text class="page-total">{{ totalPages }}</text>
       </view>
-      <t-button theme="default" size="small" variant="outline" icon="chevron-right" bindtap="nextPage" disabled="{{ currentPage >= totalPages }}">下一页</t-button>
+      <t-button size="large" theme="primary" variant="outline" icon="chevron-right" bindtap="nextPage" disabled="{{ currentPage >= totalPages }}">下一页</t-button>
     </view>
   </view>
 

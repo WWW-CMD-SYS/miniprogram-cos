@@ -3,21 +3,13 @@
 > 适用于微信小程序开发的常用 Git 命令
 
 ---
-
 ## 1. 提交代码（Commit）
-
-```bash
-# 查看修改了哪些文件
-git status
 
 # 添加所有修改到暂存区
 git add .
 
-# 或只添加特定文件
-git add pages/index/index.js
-
 # 提交并写提交信息
-git commit -m "feat: 使用 TDesign组件"
+git commit -m "feat:修改列表组件及功能"
 
 # 提交时显示改动统计
 git commit -stat -m "fix: 修复上传bug"
@@ -25,12 +17,9 @@ git commit -stat -m "fix: 修复上传bug"
 # 查看提交历史
 git log --oneline -5
 ```
-
 ---
-
 ## 2. 推送到远程（Push）
 
-```bash
 # 推送到远程仓库
 git push origin main
 
