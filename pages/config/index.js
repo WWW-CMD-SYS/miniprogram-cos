@@ -12,7 +12,9 @@ Page({
       region: '',
       baseUrl: ''
     },
-    saving: false
+    saving: false,
+    showSecretKey: false,
+    hasExistingConfig: false
   },
 
   onLoad() {
@@ -22,7 +24,7 @@ Page({
   // 加载已保存的配置
   loadSavedConfig() {
     const saved = loadConfig();
-    if (saved) {
+    if (saved && saved.secretId) {
       this.setData({
         formData: {
           secretId: saved.secretId || '',
@@ -30,12 +32,20 @@ Page({
           bucket: saved.bucket || '',
           region: saved.region || '',
           baseUrl: saved.baseUrl || ''
-        }
+        },
+        hasExistingConfig: true
       });
     }
   },
 
-  // 输入处理 - TDesign t-input 使用 bind:change
+  // 切换 SecretKey 显示/隐藏
+  toggleSecretKeyVisibility() {
+    this.setData({
+      showSecretKey: !this.data.showSecretKey
+    });
+  },
+
+  // 输入处理 - 原生 input 使用 bindinput
   onInput(e) {
     const field = e.currentTarget.dataset.field;
     const value = e.detail.value;

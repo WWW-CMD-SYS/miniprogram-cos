@@ -13,80 +13,64 @@
   <!-- 表单内容 -->
   <view class="form-container">
     <!-- 创建存储桶链接 -->
-    <view class="tip-section card">
-      <view class="tip-link" bindtap="openCosConsole">
-        <t-icon name="link" size="40rpx" />
-        <text class="link-text">前往腾讯云创建存储桶</text>
+    <view class="tip-section" bindtap="openCosConsole">
+      <view class="tip-icon-wrapper">
+        <t-icon name="cloud" size="48rpx" color="#ffffff" />
+      </view>
+      <view class="tip-content">
+        <text class="tip-title">还没有存储桶？</text>
+        <text class="tip-desc">前往腾讯云控制台快速创建</text>
+      </view>
+      <view class="tip-arrow">
+        <t-icon name="chevron-right" size="40rpx" color="rgba(255,255,255,0.7)" />
       </view>
     </view>
 
     <!-- 配置表单 -->
     <view class="card">
+      <!-- 已配置提示 -->
+      <view wx:if="{{ hasExistingConfig }}" class="config-status">
+        <text class="config-status-icon">✅</text>
+        <text class="config-status-text">已配置 COS 参数，可修改后保存</text>
+      </view>
+
       <view class="form-item">
         <text class="form-label">SecretId</text>
-        <t-input 
-          class="input" 
-          type="text" 
-          placeholder="请输入腾讯云 API SecretId"
-          value="{{ formData.secretId }}"
-          bind:change="onInput" 
-          data-field="secretId"
-        />
+        <input class="input-field" type="text" placeholder="请输入腾讯云 API SecretId" value="{{ formData.secretId }}" bindinput="onInput" data-field="secretId" />
       </view>
 
       <view class="form-item">
         <text class="form-label">SecretKey</text>
-        <t-input 
-          class="input" 
-          type="password" 
-          placeholder="请输入腾讯云 API SecretKey"
-          value="{{ formData.secretKey }}"
-          bind:change="onInput" 
-          data-field="secretKey"
-        />
+        <view class="secretkey-wrapper">
+          <input class="input-field secretkey-input" type="{{ showSecretKey ? 'text' : 'password' }}" placeholder="请输入腾讯云 API SecretKey" value="{{ formData.secretKey }}" bindinput="onInput" data-field="secretKey" />
+          <view class="eye-btn" bindtap="toggleSecretKeyVisibility">
+            <text class="eye-icon">{{ showSecretKey ? '🙈' : '👁️' }}</text>
+          </view>
+        </view>
       </view>
 
       <view class="form-item">
         <text class="form-label">存储桶名称</text>
-        <t-input 
-          class="input" 
-          type="text" 
-          placeholder="如 my-bucket-1250000000"
-          value="{{ formData.bucket }}"
-          bind:change="onInput" 
-          data-field="bucket"
-        />
+        <input class="input-field" type="text" placeholder="如 my-bucket-1250000000" value="{{ formData.bucket }}" bindinput="onInput" data-field="bucket" />
       </view>
 
       <view class="form-item">
         <text class="form-label">所属地域</text>
-        <t-input 
-          class="input" 
-          type="text" 
-          placeholder="如 ap-guangzhou"
-          value="{{ formData.region }}"
-          bind:change="onInput" 
-          data-field="region"
-        />
+        <input class="input-field" type="text" placeholder="如 ap-guangzhou" value="{{ formData.region }}" bindinput="onInput" data-field="region" />
       </view>
 
-      <view class="form-item">
-        <text class="form-label">访问域名</text>
-        <t-input 
-          class="input" 
-          type="text" 
-          placeholder="可选，留空则自动生成"
-          value="{{ formData.baseUrl }}"
-          bind:change="onInput" 
-          data-field="baseUrl"
-        />
+      <view class="form-item form-item-vertical">
+        <view class="form-row">
+          <text class="form-label">访问域名</text>
+          <input class="input-field" type="text" placeholder="可选，留空则自动生成" value="{{ formData.baseUrl }}" bindinput="onInput" data-field="baseUrl" />
+        </view>
         <text class="form-tip">留空时系统将根据 Bucket 和 Region 自动生成访问地址</text>
       </view>
 
       <!-- 按钮区域 -->
       <view class="button-group">
-        <t-button theme="default"  bindtap="goBack" disabled="{{ saving }}">取消</t-button>
-        <t-button theme="primary" icon="save" loading="{{ saving }}" bindtap="saveConfig">保存配置</t-button>
+        <t-button theme="default" variant="outline" block bind:tap="goBack" disabled="{{ saving }}" icon="close">取消</t-button>
+        <t-button theme="primary" block loading="{{ saving }}" bind:tap="saveConfig" icon="save">保存配置</t-button>
       </view>
     </view>
 

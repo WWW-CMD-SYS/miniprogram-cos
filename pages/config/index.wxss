@@ -1,14 +1,14 @@
 .config-page {
   min-height: 100vh;
-  background-color: var(--bg-color);
+  background: #ededed;
 }
 
-/* 头部样式 */
+/* 头部样式 - 微信风格 */
 .header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #003a94 100%);
+  background: #07c160;
   color: #ffffff;
-  padding: 24rpx 32rpx;
-  padding-top: calc(env(safe-area-inset-top) + 24rpx);
+  padding: 20rpx 32rpx;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
 }
 
 .header-content {
@@ -20,11 +20,19 @@
 .back-btn {
   width: 120rpx;
   font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 16rpx;
+}
+
+.back-btn:active {
+  opacity: 0.8;
 }
 
 .header-title {
   font-size: 36rpx;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* 表单容器 */
@@ -32,108 +40,242 @@
   padding: 24rpx;
 }
 
-/* 提示区域 */
+/* 提示区域 - 时尚渐变卡片风格 */
 .tip-section {
-  margin-bottom: 24rpx;
-  display: flex;
-  justify-content: center;
-}
-
-.tip-link {
+  margin-bottom: 32rpx;
   display: flex;
   align-items: center;
+  padding: 32rpx 28rpx;
+  background: linear-gradient(135deg, #07c160 0%, #05a350 100%);
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.tip-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.tip-section::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 150rpx;
+  height: 150rpx;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.tip-section:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(7, 193, 96, 0.2);
+}
+
+.tip-icon-wrapper {
+  width: 88rpx;
+  height: 88rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  backdrop-filter: blur(8rpx);
+  flex-shrink: 0;
+}
+
+.tip-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 8rpx;
-  color: var(--danger-color);
-  font-size: 28rpx;
 }
 
-.link-icon {
+.tip-title {
   font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
 }
 
-.link-text {
-  text-decoration: underline;
+.tip-desc {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
 }
 
-/* 表单 */
+.tip-arrow {
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+/* 卡片样式 - 微信风格 */
 .card {
-  background-color: var(--card-bg);
+  background-color: #ffffff;
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
 }
 
+/* 表单项 - 微信列表风格 */
 .form-item {
-  margin-bottom: 32rpx;
+  margin-bottom: 0;
+  border-bottom: 1rpx solid #e5e5e5;
+  padding: 28rpx 0;
+  display: flex;
+  align-items: center;
+}
+
+.form-item:first-child {
+  padding-top: 0;
+}
+
+.form-item:last-of-type {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* 垂直布局的表单项（带提示文字） */
+.form-item-vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-item-vertical .form-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .form-label {
-  font-size: 28rpx;
-  color: var(--text-primary);
-  margin-bottom: 12rpx;
-  font-weight: 500;
-  display: block;
+  font-size: 32rpx;
+  color: #000000;
+  font-weight: 400;
+  width: 180rpx;
+  flex-shrink: 0;
+  line-height: 48rpx;
 }
 
-/* 原生输入框样式 */
+/* 原生输入框样式 - 微信风格 */
 .input-field {
-  width: 100%;
-  padding: 20rpx 24rpx;
-  border: 1rpx solid var(--border-color);
-  border-radius: 8rpx;
-  font-size: 28rpx;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
+  flex: 1;
+  height: 48rpx;
+  line-height: 48rpx;
+  padding: 0;
+  border: none;
+  font-size: 32rpx;
+  background-color: transparent;
+  color: #000000;
   box-sizing: border-box;
 }
 
 .input-field:focus {
-  border-color: var(--primary-color);
+  outline: none;
 }
 
-/* TDesign 输入框样式覆盖 */
-.input {
-  width: 100%;
+.input-field::placeholder {
+  color: #b2b2b2;
 }
 
-/* TDesign button 样式覆盖 */
+/* SecretKey 输入框包装器 */
+.secretkey-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.secretkey-input {
+  padding-right: 60rpx;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-btn:active {
+  opacity: 0.6;
+}
+
+.eye-icon {
+  font-size: 32rpx;
+}
+
+/* 表单提示 */
+.form-tip {
+  font-size: 24rpx;
+  color: #b2b2b2;
+  margin-top: 12rpx;
+  display: block;
+  line-height: 1.5;
+  padding-left: 180rpx;
+}
+
+/* 按钮区域 - TDesign 按钮样式 */
 .button-group {
   display: flex;
   gap: 24rpx;
-  margin-top: 32rpx;
+  margin-top: 48rpx;
+  padding: 0;
 }
 
 .button-group t-button {
   flex: 1;
+  --td-button-medium-height: 96rpx;
+  --td-button-large-height: 96rpx;
+  --td-button-medium-font-size: 32rpx;
+  --td-button-large-font-size: 32rpx;
 }
 
-.form-tip {
-  font-size: 22rpx;
-  color: var(--text-placeholder);
-  margin-top: 8rpx;
-  display: block;
-  line-height: 1.4;
+/* 自定义按钮样式 */
+.button-group t-button[theme="default"] {
+  --td-button-default-bg-color: #f5f5f5;
+  --td-button-default-color: #666666;
+  --td-button-default-border-color: #e0e0e0;
 }
 
-/* 帮助说明 */
+.button-group t-button[theme="primary"] {
+  --td-button-primary-bg-color: #07c160;
+  --td-button-primary-border-color: #07c160;
+}
+
+/* 帮助说明 - 微信风格 */
 .help-section {
   padding: 24rpx;
+  background: #ffffff;
 }
 
 .help-title {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #000000;
   margin-bottom: 20rpx;
   padding-bottom: 16rpx;
-  border-bottom: 1rpx solid var(--border-color);
+  border-bottom: 1rpx solid #e5e5e5;
 }
 
 .help-content {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 24rpx;
 }
 
 .help-item {
@@ -143,13 +285,34 @@
 }
 
 .help-label {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #000000;
 }
 
 .help-desc {
-  font-size: 24rpx;
-  color: var(--text-secondary);
+  font-size: 26rpx;
+  color: #888888;
   line-height: 1.5;
+}
+
+/* 已配置提示 - 微信风格 */
+.config-status {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 24rpx;
+  background: #e6f7e6;
+  border-radius: 8rpx;
+  margin-bottom: 24rpx;
+}
+
+.config-status-icon {
+  font-size: 32rpx;
+}
+
+.config-status-text {
+  font-size: 28rpx;
+  color: #07c160;
+  font-weight: 500;
 }
