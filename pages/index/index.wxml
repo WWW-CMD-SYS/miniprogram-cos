@@ -30,7 +30,7 @@
     <view class="upload-section card">
         <view class="upload-btn-wrap">
             <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn"
-                      bindtap="chooseFile">选择文件上传
+                      bindtap="showUploadSource">选择文件上传
             </t-button>
         </view>
         <text class="upload-tip">支持所有文件类型上传，建议一次不超过 10 份</text>
@@ -169,6 +169,6 @@
         </view>
     </view>
 
-    <!-- Toast -->
+        <!-- Toast -->
     <t-toast id="t-toast"/>
 </view>

@@ -432,15 +432,118 @@ Page({
     });
   },
 
-  // 选择文件上传
-  chooseFile() {
+  // 显示上传来源选择菜单
+  showUploadSource() {
     if (!hasConfig()) {
       Toast({ message: '请先配置 COS 参数', theme: 'warning' });
       this.openConfig();
       return;
     }
 
-    // 使用 chooseMessageFile 支持所有文件类型（不限制文件类型）
+    wx.showActionSheet({
+      itemList: ['从相册选择', '从微信聊天选择'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 从相册选择
+          this.chooseFromAlbum();
+        } else if (res.tapIndex === 1) {
+          // 从微信聊天选择
+          this.chooseFromChat();
+        }
+      },
+      fail: (err) => {
+        console.error('选择取消:', err);
+      }
+    });
+  },
+
+  // 从相册选择（图片和视频）
+  chooseFromAlbum() {
+    // 图片用 chooseImage（保留原始文件名），视频用 chooseMedia（文件名用时间戳）
+    Promise.all([
+      this.chooseImagesFromAlbum(),
+      this.chooseVideosFromAlbum()
+    ]).then(([images, videos]) => {
+      const allFiles = [...images, ...videos];
+      if (allFiles.length === 0) return;
+
+      this.setData({ uploadQueue: allFiles });
+      this.uploadFiles(allFiles);
+    }).catch((err) => {
+      console.error('选择文件失败:', err);
+      if (!err.errMsg?.includes('cancel')) {
+        Toast({ message: '选择文件失败', theme: 'error' });
+      }
+    });
+  },
+
+  // 从相册选择图片（使用 chooseImage）
+  chooseImagesFromAlbum() {
+    return new Promise((resolve) => {
+      wx.chooseImage({
+        count: 10,
+        sourceType: ['album'],
+        success: (res) => {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+          const hour = String(now.getHours()).padStart(2, '0');
+          const minute = String(now.getMinutes()).padStart(2, '0');
+          const baseName = `${year}${month}${day}${hour}${minute}`;
+
+          const files = res.tempFiles.map((f, index) => ({
+            id: Date.now() + index,
+            name: `${baseName}_${index + 1}.jpg`,
+            status: 'pending',
+            path: f.path,
+            progress: 0
+          }));
+          resolve(files);
+        },
+        fail: (err) => {
+          console.error('选择图片失败:', err);
+          resolve([]);
+        }
+      });
+    });
+  },
+
+  // 从相册选择视频
+  chooseVideosFromAlbum() {
+    return new Promise((resolve) => {
+      wx.chooseMedia({
+        count: 10,
+        mediaType: ['video'],
+        sourceType: ['album'],
+        success: (res) => {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+          const hour = String(now.getHours()).padStart(2, '0');
+          const minute = String(now.getMinutes()).padStart(2, '0');
+          const baseName = `${year}${month}${day}${hour}${minute}`;
+
+          const files = res.tempFiles.map((f, index) => ({
+            id: Date.now() + Date.now() + index,
+            name: `${baseName}_${index + 1}.mp4`,
+            status: 'pending',
+            path: f.tempFilePath,
+            progress: 0
+          }));
+          resolve(files);
+        },
+        fail: (err) => {
+          console.error('选择视频失败:', err);
+          resolve([]);
+        }
+      });
+    });
+  },
+
+  // 从微信聊天选择（所有文件类型）
+  chooseFromChat() {
     wx.chooseMessageFile({
       count: 10,
       success: (res) => {
@@ -459,7 +562,6 @@ Page({
       },
       fail: (err) => {
         console.error('选择文件失败:', err);
-        // 如果用户取消选择，不提示错误
         if (!err.errMsg.includes('cancel')) {
           Toast({ message: '选择文件失败', theme: 'error' });
         }
