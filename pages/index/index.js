@@ -440,13 +440,15 @@ Page({
       return;
     }
 
+    // 使用 chooseMessageFile 支持所有文件类型（不限制文件类型）
     wx.chooseMessageFile({
       count: 10,
       success: (res) => {
         const files = res.tempFiles;
         const queue = files.map((f, index) => ({
           id: Date.now() + index,
-          name: f.name,
+          // 使用原始文件名（chooseMessageFile 会保留原始文件名）
+          name: f.name || f.path.split('/').pop() || `文件${index + 1}`,
           status: 'pending',
           path: f.path,
           progress: 0
@@ -454,6 +456,13 @@ Page({
 
         this.setData({ uploadQueue: queue });
         this.uploadFiles(queue);
+      },
+      fail: (err) => {
+        console.error('选择文件失败:', err);
+        // 如果用户取消选择，不提示错误
+        if (!err.errMsg.includes('cancel')) {
+          Toast({ message: '选择文件失败', theme: 'error' });
+        }
       }
     });
   },

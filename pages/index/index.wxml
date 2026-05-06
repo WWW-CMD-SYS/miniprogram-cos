@@ -33,7 +33,7 @@
                       bindtap="chooseFile">选择文件上传
             </t-button>
         </view>
-        <text class="upload-tip">支持多文件上传，建议一次不超过 10 份</text>
+        <text class="upload-tip">支持所有文件类型上传，建议一次不超过 10 份</text>
 
         <!-- 上传队列 -->
         <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
