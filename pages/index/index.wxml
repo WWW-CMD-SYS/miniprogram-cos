@@ -28,8 +28,10 @@
 
     <!-- 文件上传区 -->
     <view class="upload-section card">
-        <view class="upload-btn-wrap" bindtap="chooseFile">
-            <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn">选择文件上传</t-button>
+        <view class="upload-btn-wrap">
+            <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn"
+                      bindtap="chooseFile">选择文件上传
+            </t-button>
         </view>
         <text class="upload-tip">支持多文件上传，建议一次不超过 10 份</text>
 
