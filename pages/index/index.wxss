@@ -152,39 +152,42 @@
   gap: 16rpx;
 }
 
-/* 微信风格上传按钮 */
-.upload-btn-gradient {
+.upload-tbtn {
   width: 100%;
   max-width: 400rpx;
-  background: linear-gradient(135deg, #07c160 0%, #05a050 100%);
-  border-radius: 16rpx;
-  padding: 0;
-  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.35);
-  transition: all 0.2s ease;
 }
 
-.upload-btn-gradient:active {
-  transform: scale(0.98);
-  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.25);
-  background: linear-gradient(135deg, #06ad56 0%, #048a43 100%);
-}
-
-.upload-btn-content {
-  background: transparent;
-  border-radius: 16rpx;
-  padding: 28rpx 48rpx;
+/* 渐变色上传按钮（时尚靓丽风格）*/
+.upload-btn-wrap {
+  width: 100%;
+  max-width: 400rpx;
+  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 114, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16rpx;
+  transition: all 0.2s ease;
 }
 
-.upload-btn-text {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #ffffff;
+.upload-btn-wrap::after {
+  border: none;
+}
+
+.upload-btn-wrap:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(0, 114, 255, 0.3);
+  background: linear-gradient(135deg, #00a8e8 0%, #005ed9 100%);
+}
+
+/* 按钮内部文字样式 */
+.upload-inner-btn {
+  color: #ffffff !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
   letter-spacing: 2rpx;
-  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+  background: transparent !important;
+  border: none !important;
 }
 
 .upload-tip {

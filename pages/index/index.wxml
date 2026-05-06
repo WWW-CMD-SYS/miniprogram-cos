@@ -1,167 +1,172 @@
 <view class="page-container">
-  <!-- 顶部导航栏 -->
-  <view class="header">
-    <view class="header-content">
-      <view class="header-left">
-        <view class="logo-area">
-          <view class="logo-icon">☁️</view>
-          <view class="title-area">
-            <text class="title">COS 文件管理器</text>
-            <text class="subtitle">wuxiaojie个人使用版</text>
-          </view>
-        </view>
-      </view>
-      <view class="header-actions">
-        <view class="action-btn-group">
-          <view class="action-btn-item" bindtap="openConfig">
-            <t-icon name="setting" size="32rpx" color="#ffffff" />
-            <text class="action-btn-text">配置</text>
-          </view>
-          <view class="action-btn-item action-btn-primary" bindtap="fetchFileList">
-            <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
-            <text class="action-btn-text">刷新</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 文件上传区 -->
-  <view class="upload-section card">
-    <view class="upload-btn-gradient" bindtap="chooseFile">
-      <view class="upload-btn-content">
-        <t-icon name="upload" size="36rpx" color="#ffffff" />
-        <text class="upload-btn-text">选择文件上传</text>
-      </view>
-    </view>
-    <text class="upload-tip">支持多文件上传，建议一次不超过 10 份
-    </text>
-
-    <!-- 上传队列 -->
-    <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
-      <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
-        <view class="upload-info">
-          <t-icon name="file" size="32rpx" />
-          <text class="upload-name">{{ item.name }}</text>
-        </view>
-        <text class="upload-status {{ item.status }}">
-          <text wx:if="{{ item.status === 'uploading' }}">上传中...</text>
-          <text wx:elif="{{ item.status === 'success' }}">✓ 已完成</text>
-          <text wx:elif="{{ item.status === 'fail' }}">✗ 失败</text>
-        </text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 文件列表 -->
-  <view class="file-list-section card">
-    <!-- 列表头部 -->
-    <view class="list-header">
-      <view class="list-title-area">
-        <t-icon name="folder-open" size="36rpx" />
-        <text class="list-title">存储桶文件</text>
-        <view class="file-count" wx:if="{{ filteredFiles.length > 0 }}">{{ filteredFiles.length }} 个文件</view>
-      </view>
-      <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
-        <view class="selected-badge">
-          <text>已选 {{ selectedFiles.length }}</text>
-        </view>
-        <t-button theme="danger" size="small" variant="outline" icon="delete" bindtap="batchDelete">批量删除</t-button>
-      </view>
-    </view>
-
-    <!-- 搜索框 -->
-    <view class="search-section">
-      <view class="search-bar">
-        <t-icon name="search" size="36rpx" color="#999" />
-        <input
-          class="search-input"
-          type="text"
-          placeholder="搜索文件名..."
-          value="{{ searchKeyword }}"
-          bindinput="onSearchInput"
-          bindconfirm="onSearchConfirm"
-        />
-        <view wx:if="{{ searchKeyword }}" class="clear-btn" bindtap="clearSearch">
-          <t-icon name="close-circle-filled" size="36rpx" color="#999" />
-        </view>
-      </view>
-    </view>
-
-    <!-- 文件表格 -->
-    <view wx:if="{{ filteredFiles.length > 0 }}" class="table-wrapper">
-      <!-- 表头 -->
-      <view class="table">
-        <view class="tr header-row">
-          <view class="th th-checkbox" bindtap="toggleSelectAll">
-            <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ isAllSelected ? '#0052d9' : '#999' }}" />
-          </view>
-          <view class="th th-name">文件名</view>
-          <view class="th th-action">操作</view>
-        </view>
-        <!-- 数据行 -->
-        <view wx:for="{{ paginatedFiles }}" wx:key="key" class="tr {{ item.selected ? 'selected-row' : '' }}">
-          <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
-            <t-icon name="{{ item.selected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ item.selected ? '#0052d9' : '#999' }}" />
-          </view>
-          <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
-            <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="40rpx" />
-            <text class="file-name">{{ item.name }}</text>
-          </view>
-          <view class="td td-action">
-            <view class="action-btns">
-              <view class="action-btn" catchtap="previewFile" data-file="{{ item }}" title="预览">
-                <t-icon name="browse" size="38rpx" color="#0052d9" />
-              </view>
-              <view class="action-btn" catchtap="downloadFile" data-file="{{ item }}" title="下载">
-                <t-icon name="download" size="38rpx" color="#00875a" />
-              </view>
-              <view class="action-btn action-btn-danger" catchtap="deleteFile" data-file="{{ item }}" title="删除">
-                <t-icon name="delete" size="38rpx" color="#d54941" />
-              </view>
+    <!-- 顶部导航栏 -->
+    <view class="header">
+        <view class="header-content">
+            <view class="header-left">
+                <view class="logo-area">
+                    <view class="logo-icon">☁️</view>
+                    <view class="title-area">
+                        <text class="title">COS 文件管理器</text>
+                        <text class="subtitle">wuxiaojie个人使用版</text>
+                    </view>
+                </view>
             </view>
-          </view>
+            <view class="header-actions">
+                <view class="action-btn-group">
+                    <view class="action-btn-item" bindtap="openConfig">
+                        <t-icon name="setting" size="32rpx" color="#ffffff"/>
+                        <text class="action-btn-text">配置</text>
+                    </view>
+                    <view class="action-btn-item action-btn-primary" bindtap="fetchFileList">
+                        <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
+                        <text class="action-btn-text">刷新</text>
+                    </view>
+                </view>
+            </view>
         </view>
-      </view>
     </view>
 
-    <!-- 空状态 -->
-    <view wx:elif="{{ !listLoading && searchKeyword }}" class="empty-state">
-      <view class="empty-icon-area">
-        <t-icon name="search" size="120rpx" />
-      </view>
-      <text class="empty-text">未找到匹配的文件</text>
-      <text class="empty-hint">试试其他关键词</text>
-      <t-button theme="primary" variant="outline" icon="close" bindtap="clearSearch">清除搜索</t-button>
+    <!-- 文件上传区 -->
+    <view class="upload-section card">
+        <view class="upload-btn-wrap" bindtap="chooseFile">
+            <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn">选择文件上传</t-button>
+        </view>
+        <text class="upload-tip">支持多文件上传，建议一次不超过 10 份</text>
+
+        <!-- 上传队列 -->
+        <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
+            <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
+                <view class="upload-info">
+                    <t-icon name="file" size="32rpx"/>
+                    <text class="upload-name">{{ item.name }}</text>
+                </view>
+                <text class="upload-status {{ item.status }}">
+                    <text wx:if="{{ item.status === 'uploading' }}">上传中...</text>
+                    <text wx:elif="{{ item.status === 'success' }}">✓ 已完成</text>
+                    <text wx:elif="{{ item.status === 'fail' }}">✗ 失败</text>
+                </text>
+            </view>
+        </view>
     </view>
 
-    <view wx:elif="{{ !listLoading }}" class="empty-state">
-      <view class="empty-icon-area">
-        <t-icon name="file-clear" size="120rpx" />
-      </view>
-      <text class="empty-text">存储桶为空</text>
-      <text class="empty-hint">点击上方按钮上传文件</text>
-      <t-button theme="primary" variant="outline" icon="upload" bindtap="chooseFile">上传文件</t-button>
+    <!-- 文件列表 -->
+    <view class="file-list-section card">
+        <!-- 列表头部 -->
+        <view class="list-header">
+            <view class="list-title-area">
+                <t-icon name="folder-open" size="36rpx"/>
+                <text class="list-title">存储桶文件</text>
+                <view class="file-count" wx:if="{{ filteredFiles.length > 0 }}">{{ filteredFiles.length }} 个文件</view>
+            </view>
+            <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
+                <view class="selected-badge">
+                    <text>已选 {{ selectedFiles.length }}</text>
+                </view>
+                <t-button theme="danger" size="small" variant="outline" icon="delete" bindtap="batchDelete">批量删除
+                </t-button>
+            </view>
+        </view>
+
+        <!-- 搜索框 -->
+        <view class="search-section">
+            <view class="search-bar">
+                <t-icon name="search" size="36rpx" color="#999"/>
+                <input
+                        class="search-input"
+                        type="text"
+                        placeholder="搜索文件名..."
+                        value="{{ searchKeyword }}"
+                        bindinput="onSearchInput"
+                        bindconfirm="onSearchConfirm"
+                />
+                <view wx:if="{{ searchKeyword }}" class="clear-btn" bindtap="clearSearch">
+                    <t-icon name="close-circle-filled" size="36rpx" color="#999"/>
+                </view>
+            </view>
+        </view>
+
+        <!-- 文件表格 -->
+        <view wx:if="{{ filteredFiles.length > 0 }}" class="table-wrapper">
+            <!-- 表头 -->
+            <view class="table">
+                <view class="tr header-row">
+                    <view class="th th-checkbox" bindtap="toggleSelectAll">
+                        <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx"
+                                color="{{ isAllSelected ? '#0052d9' : '#999' }}"/>
+                    </view>
+                    <view class="th th-name">文件名</view>
+                    <view class="th th-action">操作</view>
+                </view>
+                <!-- 数据行 -->
+                <view wx:for="{{ paginatedFiles }}" wx:key="key" class="tr {{ item.selected ? 'selected-row' : '' }}">
+                    <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
+                        <t-icon name="{{ item.selected ? 'check-circle-filled' : 'circle' }}" size="44rpx"
+                                color="{{ item.selected ? '#0052d9' : '#999' }}"/>
+                    </view>
+                    <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
+                        <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}"
+                                size="40rpx"/>
+                        <text class="file-name">{{ item.name }}</text>
+                    </view>
+                    <view class="td td-action">
+                        <view class="action-btns">
+                            <view class="action-btn" catchtap="previewFile" data-file="{{ item }}" title="预览">
+                                <t-icon name="browse" size="38rpx" color="#0052d9"/>
+                            </view>
+                            <view class="action-btn" catchtap="downloadFile" data-file="{{ item }}" title="下载">
+                                <t-icon name="download" size="38rpx" color="#00875a"/>
+                            </view>
+                            <view class="action-btn action-btn-danger" catchtap="deleteFile" data-file="{{ item }}"
+                                  title="删除">
+                                <t-icon name="delete" size="38rpx" color="#d54941"/>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view wx:elif="{{ !listLoading && searchKeyword }}" class="empty-state">
+            <view class="empty-icon-area">
+                <t-icon name="search" size="120rpx"/>
+            </view>
+            <text class="empty-text">未找到匹配的文件</text>
+            <text class="empty-hint">试试其他关键词</text>
+            <t-button theme="primary" variant="outline" icon="close" bindtap="clearSearch">清除搜索</t-button>
+        </view>
+
+        <view wx:elif="{{ !listLoading }}" class="empty-state">
+            <view class="empty-icon-area">
+                <t-icon name="file-clear" size="120rpx"/>
+            </view>
+            <text class="empty-text">存储桶为空</text>
+            <text class="empty-hint">点击上方按钮上传文件</text>
+            <t-button theme="primary" variant="outline" icon="upload" bindtap="chooseFile">上传文件</t-button>
+        </view>
+
+        <!-- 加载状态 -->
+        <view wx:else class="loading-state">
+            <t-loading theme="circular" size="60rpx"/>
+            <text class="loading-text">加载中...</text>
+        </view>
+
+        <!-- 分页 -->
+        <view wx:if="{{ filteredFiles.length > 0 }}" class="pagination">
+            <t-button size="large" theme="primary" variant="outline" icon="chevron-left" bindtap="prevPage"
+                      disabled="{{ currentPage <= 1 }}">上一页
+            </t-button>
+            <view class="page-indicator">
+                <text class="page-current">{{ currentPage }}</text>
+                <text class="page-separator">/</text>
+                <text class="page-total">{{ totalPages }}</text>
+            </view>
+            <t-button size="large" theme="primary" variant="outline" icon="chevron-right" bindtap="nextPage"
+                      disabled="{{ currentPage >= totalPages }}">下一页
+            </t-button>
+        </view>
     </view>
 
-    <!-- 加载状态 -->
-    <view wx:else class="loading-state">
-      <t-loading theme="circular" size="60rpx" />
-      <text class="loading-text">加载中...</text>
-    </view>
-
-    <!-- 分页 -->
-    <view wx:if="{{ filteredFiles.length > 0 }}" class="pagination">
-      <t-button size="large" theme="primary" variant="outline" icon="chevron-left" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</t-button>
-      <view class="page-indicator">
-        <text class="page-current">{{ currentPage }}</text>
-        <text class="page-separator">/</text>
-        <text class="page-total">{{ totalPages }}</text>
-      </view>
-      <t-button size="large" theme="primary" variant="outline" icon="chevron-right" bindtap="nextPage" disabled="{{ currentPage >= totalPages }}">下一页</t-button>
-    </view>
-  </view>
-
-  <!-- Toast -->
-  <t-toast id="t-toast" />
+    <!-- Toast -->
+    <t-toast id="t-toast"/>
 </view>
