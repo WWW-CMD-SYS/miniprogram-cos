@@ -15,8 +15,11 @@ Page({
     pageSize: 10,
     // 计算属性需要手动放在 data 中
     paginatedFiles: [],
+    filteredFiles: [],
     totalPages: 0,
-    isAllSelected: false
+    isAllSelected: false,
+    // 搜索相关
+    searchKeyword: ''
   },
 
   onLoad() {
@@ -67,24 +70,57 @@ Page({
     wx.navigateTo({ url: '/pages/config/index' });
   },
 
-  // 计算分页和选中状态
+  // 搜索输入处理
+  onSearchInput(e) {
+    const keyword = e.detail.value || '';
+    this.setData({ searchKeyword: keyword });
+    this.setData({ currentPage: 1 }); // 重置到第一页
+    this.updateComputed();
+  },
+
+  // 搜索确认（键盘回车）
+  onSearchConfirm(e) {
+    const keyword = e.detail.value || '';
+    this.setData({ searchKeyword: keyword });
+    this.setData({ currentPage: 1 });
+    this.updateComputed();
+  },
+
+  // 清除搜索
+  clearSearch() {
+    this.setData({ searchKeyword: '' });
+    this.setData({ currentPage: 1 });
+    this.updateComputed();
+  },
+
+  // 计算分页和选中状态（包含过滤逻辑）
   updateComputed() {
-    const { fileList, selectedFiles, currentPage, pageSize } = this.data;
+    const { fileList, selectedFiles, currentPage, pageSize, searchKeyword } = this.data;
+
+    // 根据关键词过滤文件
+    let filtered = fileList;
+    if (searchKeyword && searchKeyword.trim()) {
+      const keyword = searchKeyword.trim().toLowerCase();
+      filtered = fileList.filter(file =>
+        file.name && file.name.toLowerCase().includes(keyword)
+      );
+    }
 
     // 计算分页数据，并给每个文件添加 selected 属性
-    const totalPages = Math.max(1, Math.ceil(fileList.length / pageSize));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
     const safePage = Math.min(currentPage, totalPages);
     const start = (safePage - 1) * pageSize;
     const end = start + pageSize;
-    const paginatedFiles = fileList.slice(start, end).map(f => ({
+    const paginatedFiles = filtered.slice(start, end).map(f => ({
       ...f,
       selected: selectedFiles.includes(f.key)
     }));
 
-    // 计算是否全选
+    // 计算是否全选（基于当前页）
     const isAllSelected = paginatedFiles.length > 0 && paginatedFiles.every(f => f.selected);
 
     this.setData({
+      filteredFiles: filtered,
       paginatedFiles,
       totalPages,
       isAllSelected,
@@ -108,7 +144,8 @@ Page({
         this.setData({
           fileList: res.data.files || [],
           selectedFiles: [],
-          currentPage: 1
+          currentPage: 1,
+          searchKeyword: '' // 重置搜索
         });
         this.updateComputed();
         Toast({ message: `加载成功，共 ${res.data.files?.length || 0} 个文件`, theme: 'success' });

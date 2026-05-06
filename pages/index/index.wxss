@@ -297,7 +297,117 @@
   border-radius: 20rpx;
 }
 
-/* ========== 表格样式 ========== */
+/* ========== 搜索框样式 ========== */
+.search-section {
+  padding: 0 24rpx 20rpx;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  border-radius: 40rpx;
+  padding: 16rpx 24rpx;
+  gap: 12rpx;
+  border: 2rpx solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4rpx rgba(0, 82, 217, 0.1);
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  height: 48rpx;
+  line-height: 48rpx;
+}
+
+.search-input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.clear-btn {
+  padding: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== TDesign 表格样式 ========== */
+.table-wrapper {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.selected-row {
+  background-color: rgba(0, 82, 217, 0.08) !important;
+}
+
+/* 表格单元格样式 */
+.th-checkbox, .td-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.th-checkbox:active, .td-checkbox:active {
+  opacity: 0.7;
+  transform: scale(0.9);
+}
+
+/* 文件信息 */
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 8rpx 0;
+}
+
+.file-name {
+  color: var(--text-primary);
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 26rpx;
+}
+
+/* 图标操作按钮组 */
+.action-btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+}
+
+.action-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.2s;
+}
+
+.action-btn:active {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(0.92);
+}
+
+.action-btn-danger:active {
+  background-color: rgba(213, 73, 65, 0.1);
+}
+
+/* ========== 原有表格样式（保留兼容性）========== */
 .file-table {
   font-size: 24rpx;
 }
@@ -369,50 +479,6 @@
 .th-op, .td-op {
   width: 220rpx;
   justify-content: flex-end;
-}
-
-/* 文件信息 */
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.file-name {
-  color: var(--text-primary);
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: 26rpx;
-}
-
-/* 图标操作按钮组 */
-.action-btns {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.action-btn {
-  width: 56rpx;
-  height: 56rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background-color: transparent;
-  transition: all 0.2s;
-}
-
-.action-btn:active {
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: scale(0.92);
-}
-
-.action-btn-danger:active {
-  background-color: rgba(213, 73, 65, 0.1);
 }
 
 /* ========== 空状态 ========== */
@@ -495,4 +561,74 @@
 .page-total {
   font-size: 24rpx;
   color: var(--text-secondary);
+}
+
+/* ========== 原生表格样式 ========== */
+.table {
+  width: 100%;
+  font-size: 26rpx;
+}
+
+.tr {
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.tr.header-row {
+  background-color: var(--bg-color);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.tr:not(.header-row) {
+  background-color: var(--card-bg);
+}
+
+.tr:not(.header-row):active {
+  background-color: rgba(0, 82, 217, 0.08);
+}
+
+.th, .td {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 12rpx;
+}
+
+.th-checkbox, .td-checkbox {
+  width: 80rpx;
+  min-width: 80rpx;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.th-name, .td-name {
+  flex: 1;
+  padding: 20rpx 16rpx;
+  overflow: hidden;
+}
+
+.th-action, .td-action {
+  width: 220rpx;
+  min-width: 220rpx;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 文件名样式 */
+.td-name {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.td-name .file-name {
+  flex: 1;
+  color: var(--text-primary);
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 26rpx;
 }

@@ -60,7 +60,7 @@
       <view class="list-title-area">
         <t-icon name="folder-open" size="36rpx" />
         <text class="list-title">存储桶文件</text>
-        <view class="file-count" wx:if="{{ fileList.length > 0 }}">{{ fileList.length }} 个文件</view>
+        <view class="file-count" wx:if="{{ filteredFiles.length > 0 }}">{{ filteredFiles.length }} 个文件</view>
       </view>
       <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
         <view class="selected-badge">
@@ -70,30 +70,45 @@
       </view>
     </view>
 
-    <!-- 文件表格 - 带斑马纹样式 -->
-    <view wx:if="{{ fileList.length > 0 }}" class="file-table">
-      <!-- 表头 -->
-      <view class="table-header">
-        <view class="th th-checkbox" bindtap="toggleSelectAll">
-          <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ isAllSelected ? '#0052d9' : '#999' }}" />
+    <!-- 搜索框 -->
+    <view class="search-section">
+      <view class="search-bar">
+        <t-icon name="search" size="36rpx" color="#999" />
+        <input
+          class="search-input"
+          type="text"
+          placeholder="搜索文件名..."
+          value="{{ searchKeyword }}"
+          bindinput="onSearchInput"
+          bindconfirm="onSearchConfirm"
+        />
+        <view wx:if="{{ searchKeyword }}" class="clear-btn" bindtap="clearSearch">
+          <t-icon name="close-circle-filled" size="36rpx" color="#999" />
         </view>
-        <view class="th th-name">文件名</view>
-        <view class="th th-op">操作</view>
       </view>
+    </view>
 
-      <!-- 表体 -->
-      <scroll-view scroll-y class="table-body">
-        <view wx:for="{{ paginatedFiles }}" wx:key="key" class="table-row zebra-{{ index % 2 === 0 ? 'odd' : 'even' }} {{ item.selected ? 'selected' : '' }}">
+    <!-- 文件表格 -->
+    <view wx:if="{{ filteredFiles.length > 0 }}" class="table-wrapper">
+      <!-- 表头 -->
+      <view class="table">
+        <view class="tr header-row">
+          <view class="th th-checkbox" bindtap="toggleSelectAll">
+            <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ isAllSelected ? '#0052d9' : '#999' }}" />
+          </view>
+          <view class="th th-name">文件名</view>
+          <view class="th th-action">操作</view>
+        </view>
+        <!-- 数据行 -->
+        <view wx:for="{{ paginatedFiles }}" wx:key="key" class="tr {{ item.selected ? 'selected-row' : '' }}">
           <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
             <t-icon name="{{ item.selected ? 'check-circle-filled' : 'circle' }}" size="44rpx" color="{{ item.selected ? '#0052d9' : '#999' }}" />
           </view>
           <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
-            <view class="file-info">
-              <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="40rpx" />
-              <text class="file-name">{{ item.name }}</text>
-            </view>
+            <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}" size="40rpx" />
+            <text class="file-name">{{ item.name }}</text>
           </view>
-          <view class="td td-op">
+          <view class="td td-action">
             <view class="action-btns">
               <view class="action-btn" catchtap="previewFile" data-file="{{ item }}" title="预览">
                 <t-icon name="browse" size="38rpx" color="#0052d9" />
@@ -107,10 +122,19 @@
             </view>
           </view>
         </view>
-      </scroll-view>
+      </view>
     </view>
 
     <!-- 空状态 -->
+    <view wx:elif="{{ !listLoading && searchKeyword }}" class="empty-state">
+      <view class="empty-icon-area">
+        <t-icon name="search" size="120rpx" />
+      </view>
+      <text class="empty-text">未找到匹配的文件</text>
+      <text class="empty-hint">试试其他关键词</text>
+      <t-button theme="primary" variant="outline" icon="close" bindtap="clearSearch">清除搜索</t-button>
+    </view>
+
     <view wx:elif="{{ !listLoading }}" class="empty-state">
       <view class="empty-icon-area">
         <t-icon name="file-clear" size="120rpx" />
@@ -127,7 +151,7 @@
     </view>
 
     <!-- 分页 -->
-    <view wx:if="{{ fileList.length > 0 }}" class="pagination">
+    <view wx:if="{{ filteredFiles.length > 0 }}" class="pagination">
       <t-button size="large" theme="primary" variant="outline" icon="chevron-left" bindtap="prevPage" disabled="{{ currentPage <= 1 }}">上一页</t-button>
       <view class="page-indicator">
         <text class="page-current">{{ currentPage }}</text>
