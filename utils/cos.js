@@ -47,11 +47,24 @@ export const requestApi = async (action, method = 'GET', data = null) => {
 
 /**
  * 上传文件到 COS（通过后端代理）
+ * @param {string} filePath - 文件临时路径
+ * @param {string} fileName - 原始文件名
+ * @param {object} options - 其他选项（如 onProgress）
  */
-export const uploadFile = (filePath, formData = {}) => {
+export const uploadFile = (filePath, fileName, options = {}) => {
   const config = loadConfig();
   if (!config) {
     return Promise.reject(new Error('请先配置 COS 参数'));
+  }
+
+  // 构建 formData
+  const formData = {
+    fileName: fileName
+  };
+
+  // 如果有进度回调
+  if (options.onProgress) {
+    formData.onProgress = options.onProgress;
   }
 
   return new Promise((resolve, reject) => {
@@ -66,7 +79,9 @@ export const uploadFile = (filePath, formData = {}) => {
         'x-cos-region': config.region,
         'x-cos-base-url': config.baseUrl || ''
       },
-      formData,
+      formData: {
+        fileName: fileName
+      },
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try {
@@ -95,11 +110,11 @@ export const uploadFile = (filePath, formData = {}) => {
     });
 
     // 上传进度回调
-    uploadTask.onProgressUpdate((res) => {
-      if (formData.onProgress) {
-        formData.onProgress(res.progress);
-      }
-    });
+    if (options.onProgress) {
+      uploadTask.onProgressUpdate((res) => {
+        options.onProgress(res.progress);
+      });
+    }
   });
 };
 

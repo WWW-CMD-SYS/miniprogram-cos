@@ -141,14 +141,40 @@ Page({
     try {
       const res = await listFiles();
       if (res.code === 0) {
+        // 处理文件列表，提取原始文件名
+        const files = (res.data.files || []).map(file => {
+          // 优先使用 name 字段，否则从 key 中提取
+          let name = file.name;
+          if (!name && file.key) {
+            // 尝试解码 URL 编码的文件名
+            try {
+              name = decodeURIComponent(file.key);
+            } catch (e) {
+              name = file.key;
+            }
+            // 如果解码后看起来还是哈希值（没有扩展名或太短），保留原 key
+            const hasExt = /\.[a-zA-Z0-9]+$/.test(name);
+            if (!hasExt && name.length < 20) {
+              name = file.key;
+            }
+          }
+          return {
+            ...file,
+            name: name || file.key
+          };
+        });
+
+        console.log('文件列表原始数据:', res.data.files);
+        console.log('处理后文件列表:', files);
+
         this.setData({
-          fileList: res.data.files || [],
+          fileList: files,
           selectedFiles: [],
           currentPage: 1,
           searchKeyword: '' // 重置搜索
         });
         this.updateComputed();
-        Toast({ message: `加载成功，共 ${res.data.files?.length || 0} 个文件`, theme: 'success' });
+        Toast({ message: `加载成功，共 ${files.length} 个文件`, theme: 'success' });
       } else {
         Toast({ message: res.message || '获取列表失败', theme: 'error' });
       }
@@ -442,7 +468,7 @@ Page({
       });
 
       try {
-        const result = await uploadFile(file.path, {
+        const result = await uploadFile(file.path, file.name, {
           onProgress: (progress) => {
             this.setData({
               [`uploadQueue[${i}].progress`]: progress
