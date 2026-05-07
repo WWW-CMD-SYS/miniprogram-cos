@@ -5,7 +5,7 @@
 const CONFIG_KEY = 'cos_manager_config';
 
 // 后端 API 基础地址
-const API_BASE_URL = 'http://10.25.225.144:3000/api';
+const API_BASE_URL = 'http://10.25.225.144:8001/api';
 
 /**
  * 获取 API 基础地址
