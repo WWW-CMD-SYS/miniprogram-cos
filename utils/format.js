@@ -52,6 +52,9 @@ export const getFileType = (filename) => {
   const officeExts = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp'];
   if (officeExts.includes(ext)) return 'office';
 
+  const videoExts = ['mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'm4v', 'mpg', 'mpeg', '3gp', 'ts', 'mts'];
+  if (videoExts.includes(ext)) return 'video';
+
   const textExts = ['txt', 'md', 'csv', 'json', 'xml', 'html', 'htm', 'css', 'js', 'ts', 'log', 'yaml', 'yml'];
   if (textExts.includes(ext)) return 'text';
 

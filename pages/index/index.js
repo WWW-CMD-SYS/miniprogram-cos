@@ -259,6 +259,16 @@ Page({
         urls: [file.url],
         current: file.url
       });
+    } else if (type === 'video') {
+      // 使用 previewMedia 预览视频（基础库 2.20.0+ 支持）
+      wx.previewMedia({
+        sources: [{
+          url: file.url,
+          type: 'video',
+          poster: '' // COS 视频无封面，留空
+        }],
+        current: 0
+      });
     } else if (type === 'pdf' || type === 'office') {
       wx.showLoading({ title: '加载中...' });
       wx.downloadFile({
@@ -459,86 +469,43 @@ Page({
 
   // 从相册选择（图片和视频）
   chooseFromAlbum() {
-    // 图片用 chooseImage（保留原始文件名），视频用 chooseMedia（文件名用时间戳）
-    Promise.all([
-      this.chooseImagesFromAlbum(),
-      this.chooseVideosFromAlbum()
-    ]).then(([images, videos]) => {
-      const allFiles = [...images, ...videos];
-      if (allFiles.length === 0) return;
+    // 统一使用 chooseMedia，避免真机上同时调用 chooseImage + chooseMedia 的冲突
+    wx.chooseMedia({
+      count: 9,
+      mediaType: ['image', 'video'],
+      sourceType: ['album'],
+      success: (res) => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        const baseName = `${year}${month}${day}${hour}${minute}`;
 
-      this.setData({ uploadQueue: allFiles });
-      this.uploadFiles(allFiles);
-    }).catch((err) => {
-      console.error('选择文件失败:', err);
-      if (!err.errMsg?.includes('cancel')) {
-        Toast({ message: '选择文件失败', theme: 'error' });
-      }
-    });
-  },
-
-  // 从相册选择图片（使用 chooseImage）
-  chooseImagesFromAlbum() {
-    return new Promise((resolve) => {
-      wx.chooseImage({
-        count: 10,
-        sourceType: ['album'],
-        success: (res) => {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, '0');
-          const day = String(now.getDate()).padStart(2, '0');
-          const hour = String(now.getHours()).padStart(2, '0');
-          const minute = String(now.getMinutes()).padStart(2, '0');
-          const baseName = `${year}${month}${day}${hour}${minute}`;
-
-          const files = res.tempFiles.map((f, index) => ({
+        const files = res.tempFiles.map((f, index) => {
+          const isVideo = f.fileType === 'video';
+          const ext = isVideo ? 'mp4' : 'jpg';
+          return {
             id: Date.now() + index,
-            name: `${baseName}_${index + 1}.jpg`,
-            status: 'pending',
-            path: f.path,
-            progress: 0
-          }));
-          resolve(files);
-        },
-        fail: (err) => {
-          console.error('选择图片失败:', err);
-          resolve([]);
-        }
-      });
-    });
-  },
-
-  // 从相册选择视频
-  chooseVideosFromAlbum() {
-    return new Promise((resolve) => {
-      wx.chooseMedia({
-        count: 10,
-        mediaType: ['video'],
-        sourceType: ['album'],
-        success: (res) => {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, '0');
-          const day = String(now.getDate()).padStart(2, '0');
-          const hour = String(now.getHours()).padStart(2, '0');
-          const minute = String(now.getMinutes()).padStart(2, '0');
-          const baseName = `${year}${month}${day}${hour}${minute}`;
-
-          const files = res.tempFiles.map((f, index) => ({
-            id: Date.now() + Date.now() + index,
-            name: `${baseName}_${index + 1}.mp4`,
+            name: `${baseName}_${index + 1}.${ext}`,
             status: 'pending',
             path: f.tempFilePath,
             progress: 0
-          }));
-          resolve(files);
-        },
-        fail: (err) => {
-          console.error('选择视频失败:', err);
-          resolve([]);
+          };
+        });
+
+        if (files.length > 0) {
+          this.setData({ uploadQueue: files });
+          this.uploadFiles(files);
         }
-      });
+      },
+      fail: (err) => {
+        console.error('选择文件失败:', err);
+        if (!err.errMsg?.includes('cancel')) {
+          Toast({ message: '选择文件失败', theme: 'error' });
+        }
+      }
     });
   },
 

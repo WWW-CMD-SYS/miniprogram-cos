@@ -20,11 +20,21 @@
       <!-- 图片预览 -->
       <image
         wx:elif="{{ fileType === 'image' }}"
-        :src="{{ fileInfo.url }}"
+        src="{{ fileInfo.url }}"
         class="preview-image"
         mode="aspectFit"
         bindtap="previewImage"
+      />
+      <!-- 视频预览 -->
+      <video
+        wx:elif="{{ fileType === 'video' }}"
+        class="preview-video"
         src="{{ fileInfo.url }}"
+        controls
+        autoplay
+        show-center-play-btn
+        show-fullscreen-btn
+        enable-progress-gesture
       />
       <!-- 文本预览 -->
       <scroll-view

@@ -72,6 +72,7 @@ export const uploadFile = (filePath, fileName, options = {}) => {
       url: `${getApiBaseUrl()}/upload`,
       filePath: filePath,
       name: 'file',
+      timeout: 300000, // 视频文件较大，超时设为 5 分钟
       header: {
         'x-cos-secret-id': config.secretId,
         'x-cos-secret-key': config.secretKey,
