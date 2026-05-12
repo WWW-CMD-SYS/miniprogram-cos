@@ -58,19 +58,19 @@
         <text class="form-label">所属地域</text>
         <input class="input-field" type="text" placeholder="如 ap-guangzhou" value="{{ formData.region }}" bindinput="onInput" data-field="region" />
       </view>
-
-      <view class="form-item form-item-vertical">
-        <view class="form-row">
-          <text class="form-label">访问域名</text>
-          <input class="input-field" type="text" placeholder="可选，留空则自动生成" value="{{ formData.baseUrl }}" bindinput="onInput" data-field="baseUrl" />
-        </view>
-        <text class="form-tip">留空时系统将根据 Bucket 和 Region 自动生成访问地址</text>
-      </view>
-
       <!-- 按钮区域 -->
       <view class="button-group">
-        <t-button theme="default" variant="outline" block bind:tap="goBack" disabled="{{ saving }}" icon="close">取消</t-button>
-        <t-button theme="primary" block loading="{{ saving }}" bind:tap="saveConfig" icon="save">保存配置</t-button>
+        <view class="btn-cancel" bindtap="goBack" hover-class="btn-cancel-hover">
+          <text class="btn-icon btn-cancel-icon">✕</text>
+          <text class="btn-cancel-text">取消</text>
+        </view>
+        <view class="btn-save" bindtap="saveConfig" hover-class="btn-save-hover">
+          <text wx:if="{{!saving}}" class="btn-icon btn-save-icon">✓</text>
+          <view wx:else class="btn-loading">
+            <view class="loading-spinner"></view>
+          </view>
+          <text wx:if="{{!saving}}" class="btn-save-text">保存配置</text>
+        </view>
       </view>
     </view>
 
@@ -83,16 +83,16 @@
           <text class="help-desc">前往腾讯云控制台 → 访问管理 → API 密钥管理 获取</text>
         </view>
         <view class="help-item">
+          <text class="help-label">存储桶信息</text>
+          <text class="help-desc">前往腾讯云控制台 → 存储桶列表 → 概览</text>
+        </view>
+        <view class="help-item">
           <text class="help-label">存储桶名称</text>
-          <text class="help-desc">格式：bucket-appid，如 my-bucket-1250000000</text>
+          <text class="help-desc">如：my-bucket-1250000000</text>
         </view>
         <view class="help-item">
           <text class="help-label">所属地域</text>
-          <text class="help-desc">存储桶所在地域，如 ap-guangzhou（广州）、ap-shanghai（上海）</text>
-        </view>
-        <view class="help-item">
-          <text class="help-label">访问域名</text>
-          <text class="help-desc">可选配置，用于自定义域名访问</text>
+          <text class="help-desc">如：ap-shanghai（上海）</text>
         </view>
       </view>
     </view>
