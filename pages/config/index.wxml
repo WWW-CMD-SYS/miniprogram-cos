@@ -88,11 +88,11 @@
         </view>
         <view class="help-item">
           <text class="help-label">存储桶名称</text>
-          <text class="help-desc">如：my-bucket-1250000000</text>
+          <text class="help-desc">格式示例：my-bucket-1250000000</text>
         </view>
         <view class="help-item">
           <text class="help-label">所属地域</text>
-          <text class="help-desc">如：ap-shanghai（上海）</text>
+          <text class="help-desc">格式示例：ap-shanghai（上海）</text>
         </view>
       </view>
     </view>

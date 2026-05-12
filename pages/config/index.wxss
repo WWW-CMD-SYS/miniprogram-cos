@@ -275,7 +275,7 @@
 
 /* 保存按钮 - 微信绿实心风格 */
 .btn-save {
-  flex: 1.2;
+  flex: 1;
   height: 88rpx;
   display: flex;
   align-items: center;
