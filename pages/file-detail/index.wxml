@@ -35,6 +35,8 @@
         show-center-play-btn
         show-fullscreen-btn
         enable-progress-gesture
+        bindloadedmetadata="onVideoLoaded"
+        binderror="onVideoError"
       />
       <!-- 文本预览 -->
       <scroll-view

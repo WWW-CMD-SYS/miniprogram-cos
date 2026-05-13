@@ -84,6 +84,17 @@ Page({
     wx.navigateBack();
   },
 
+  // 视频加载成功
+  onVideoLoaded() {
+    console.log('视频加载成功');
+  },
+
+  // 视频加载失败
+  onVideoError(e) {
+    console.error('视频加载失败:', e.detail);
+    this.showToast('视频加载失败，请检查网络或域名配置', 'error');
+  },
+
   // 预览图片
   previewImage() {
     wx.previewImage({

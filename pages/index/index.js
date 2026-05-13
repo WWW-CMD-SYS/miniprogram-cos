@@ -261,14 +261,24 @@ Page({
       });
     } else if (type === 'video') {
       // 使用 previewMedia 预览视频（基础库 2.20.0+ 支持）
-      wx.previewMedia({
-        sources: [{
-          url: file.url,
-          type: 'video',
-          poster: '' // COS 视频无封面，留空
-        }],
-        current: 0
-      });
+      try {
+        wx.previewMedia({
+          sources: [{
+            url: file.url,
+            type: 'video',
+            poster: '' // COS 视频无封面，留空
+          }],
+          current: 0,
+          fail: () => {
+            // previewMedia 失败时降级到详情页使用 <video> 组件
+            this.openFile(e);
+          }
+        });
+      } catch (err) {
+        // previewMedia API 不存在（基础库 < 2.20.0），降级到详情页
+        console.warn('previewMedia 不可用，降级到详情页:', err);
+        this.openFile(e);
+      }
     } else if (type === 'pdf' || type === 'office') {
       wx.showLoading({ title: '加载中...' });
       wx.downloadFile({
