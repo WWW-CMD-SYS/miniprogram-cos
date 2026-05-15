@@ -6,11 +6,11 @@ import Toast from 'tdesign-miniprogram/toast/index';
 Page({
   data: {
     formData: {
-      secretId: '',
-      secretKey: '',
-      bucket: '',
-      region: '',
-      baseUrl: ''
+      secretId: '',      // 腾讯云 SecretId
+      secretKey: '',     // 腾讯云 SecretKey
+      bucket: '',        // COS 存储桶名称
+      region: '',        // 地域（如 ap-guangzhou）
+      baseUrl: ''        // 基础 URL
     },
     saving: false,
     showSecretKey: false,
