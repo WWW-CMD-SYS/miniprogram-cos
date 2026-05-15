@@ -105,53 +105,284 @@ function getCosInstance() {
 }
 
 /**
- * 上传文件
+ * 上传文件（通过后端 API 代理上传）
+ *
+ * 大文件策略：
+ * - 文件 >= 5MB → 使用 FileSystemManager.readFile 分片并发上传
+ *   （绕过 wx.uploadFile 在 iOS 真机上的大文件超时问题）
+ * - 文件 < 5MB  → wx.uploadFile 直传后端
+ *
  * @param {string} filePath - 文件临时路径
  * @param {string} key - COS 存储路径（如 images/test.jpg）
- * @param {object} options - 其他选项
+ * @param {object} options - 其他选项（如 onProgress）
  */
 export const uploadFile = (filePath, key, options = {}) => {
+  const { bucket, region } = getBucketConfig();
+  if (!bucket || !region) {
+    return Promise.reject(new Error('请先配置 COS 参数（Bucket 和 Region）'));
+  }
+
+  // 先获取文件大小，决定上传策略
   return new Promise((resolve, reject) => {
-    const cos = getCosInstance();
+    wx.getFileInfo({
+      filePath,
+      success: (info) => {
+        const fileSize = info.size;
+        console.log(`[upload] 文件大小: ${fileSize} bytes, 文件名: ${key}`);
 
-    // 获取存储桶配置
-    const { bucket, region } = getBucketConfig();
-    if (!bucket || !region) {
-      reject(new Error('请先配置 COS 参数（Bucket 和 Region）'));
-      return;
-    }
-
-    cos.putObject(
-      {
-        Bucket: bucket,
-        Region: region,
-        Key: key,
-        FilePath: filePath,
-        onProgress: (info) => {
-          if (options.onProgress) {
-            options.onProgress(Math.round(info.percent * 100));
-          }
-        },
-      },
-      (err, data) => {
-        if (err) {
-          console.error('上传失败:', err);
-          reject(new Error(err.message || '上传失败'));
+        if (fileSize >= 5 * 1024 * 1024) {
+          console.log('[upload] cos-cloud: 使用分片上传策略');
+          uploadInChunksCloud(filePath, key, fileSize, options)
+            .then(resolve)
+            .catch(reject);
         } else {
-          resolve({
-            code: 0,
-            message: '上传成功',
-            data: {
-              key: key,
-              etag: data.ETag,
-              location: `https://${bucket}.cos.${region}.myqcloud.com/${key}`,
-            },
-          });
+          console.log('[upload] cos-cloud: 使用 wx.uploadFile 策略');
+          tryUploadViaUploadFile(filePath, key, options)
+            .then(resolve)
+            .catch(reject);
         }
+      },
+      fail: (err) => {
+        console.error('[upload] getFileInfo 失败，降级使用分片上传:', err);
+        uploadInChunksCloud(filePath, key, -1, options)
+          .then(resolve)
+          .catch(reject);
       }
-    );
+    });
   });
 };
+
+/**
+ * 小文件上传（wx.uploadFile 直传后端）
+ */
+function tryUploadViaUploadFile(filePath, key, options = {}) {
+  return new Promise((resolve, reject) => {
+    const apiBase = getApiBaseUrl();
+    let configHeaders = {};
+    try {
+      const rawConfig = wx.getStorageSync('cos_manager_config');
+      if (rawConfig) {
+        const parsed = typeof rawConfig === 'string' ? JSON.parse(rawConfig) : rawConfig;
+        if (parsed.secretId) configHeaders['x-cos-secret-id'] = parsed.secretId;
+        if (parsed.secretKey) configHeaders['x-cos-secret-key'] = parsed.secretKey;
+        if (parsed.bucket) configHeaders['x-cos-bucket'] = parsed.bucket;
+        if (parsed.region) configHeaders['x-cos-region'] = parsed.region;
+        if (parsed.baseUrl) configHeaders['x-cos-base-url'] = parsed.baseUrl;
+      }
+    } catch (e) {
+      // 忽略
+    }
+
+    console.log(`[upload] uploadFile 直传: ${key}`);
+    const uploadTask = wx.uploadFile({
+      url: `${apiBase}/upload`,
+      filePath: filePath,
+      name: 'file',
+      timeout: 600000,
+      header: configHeaders,
+      formData: {
+        fileName: key,
+      },
+      success: (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            const data = JSON.parse(res.data);
+            if (data.code === 0) {
+              resolve({
+                code: 0,
+                message: '上传成功',
+                data: data.data || {
+                  key: key,
+                  location: `https://${bucket}.cos.${region}.myqcloud.com/${key}`,
+                },
+              });
+            } else {
+              reject(new Error(data.message || '上传失败'));
+            }
+          } catch (e) {
+            reject(new Error('解析响应失败'));
+          }
+        } else {
+          try {
+            const data = JSON.parse(res.data);
+            reject(new Error(data.message || `上传失败: ${res.statusCode}`));
+          } catch (e) {
+            reject(new Error(`上传失败: ${res.statusCode}`));
+          }
+        }
+      },
+      fail: (err) => {
+        console.error('后端代理上传失败:', err);
+        reject(new Error(err.errMsg || '网络请求失败，请检查网络连接'));
+      },
+    });
+
+    if (options.onProgress) {
+      uploadTask.onProgressUpdate((res) => {
+        options.onProgress(res.progress);
+      });
+    }
+  });
+}
+
+/**
+ * 分片上传（cos-cloud 版本）
+ *
+ * 原理同 cos.js 的 uploadInChunks：
+ * - 用 fs.readFile (position+length) 分片读取
+ * - 并发上传到 /upload-chunk-* 接口
+ * - 支持自动重试和进度回调
+ */
+function uploadInChunksCloud(filePath, fileName, fileSize, options) {
+  const CHUNK_SIZE = 48 * 1024; // 每片 48KB，base64 编码后约 64KB，确保低于后端 body-parser 100KB (102400 bytes) 限制
+  const CONCURRENCY = 6; // 分片变小了，提高并发数补偿总速度
+  const fs = wx.getFileSystemManager();
+  const uploadId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      // 1. 获取文件大小
+      if (fileSize < 0) {
+        try {
+          const info = await new Promise((res, rej) => {
+            wx.getFileInfo({ filePath, success: res, fail: rej });
+          });
+          fileSize = info.size;
+        } catch {
+          fileSize = 100 * 1024 * 1024;
+        }
+      }
+
+      const totalChunks = Math.ceil(fileSize / CHUNK_SIZE);
+      const apiBase = getApiBaseUrl();
+      let configHeaders = {};
+
+      try {
+        const rawConfig = wx.getStorageSync('cos_manager_config');
+        if (rawConfig) {
+          const parsed = typeof rawConfig === 'string' ? JSON.parse(rawConfig) : rawConfig;
+          if (parsed.secretId) configHeaders['x-cos-secret-id'] = parsed.secretId;
+          if (parsed.secretKey) configHeaders['x-cos-secret-key'] = parsed.secretKey;
+          if (parsed.bucket) configHeaders['x-cos-bucket'] = parsed.bucket;
+          if (parsed.region) configHeaders['x-cos-region'] = parsed.region;
+          if (parsed.baseUrl) configHeaders['x-cos-base-url'] = parsed.baseUrl;
+        }
+      } catch (e) {}
+
+      console.log(`[chunk-cloud] 总共 ${totalChunks} 片，每片 ${CHUNK_SIZE / 1024}KB，并发 ${CONCURRENCY}`);
+
+      // 2. 初始化
+      const initRes = await requestPromise({
+        url: `${apiBase}/upload-chunk-init`,
+        method: 'POST',
+        header: { ...configHeaders, 'Content-Type': 'application/json' },
+        data: { fileName, fileSize, totalChunks, uploadId },
+      });
+      if (initRes.code !== 0) throw new Error(initRes.message || '初始化失败');
+
+      // 3. 并发上传分片
+      let uploadedCount = 0;
+      let nextChunkIndex = 0;
+
+      const uploadOneChunk = async (chunkIndex) => {
+        const start = chunkIndex * CHUNK_SIZE;
+        const length = Math.min(CHUNK_SIZE, fileSize - start);
+        let lastErr = null;
+
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const readRes = await new Promise((res, rej) => {
+              fs.readFile({
+                filePath,
+                encoding: 'base64',
+                position: start,
+                length,
+                success: res,
+                fail: rej,
+              });
+            });
+
+            const chunkRes = await requestPromise({
+              url: `${apiBase}/upload-chunk`,
+              method: 'POST',
+              header: { ...configHeaders, 'Content-Type': 'application/json' },
+              data: { uploadId, chunkIndex, totalChunks, fileName, fileData: readRes.data },
+              timeout: 120000,
+            });
+            if (chunkRes.code !== 0) throw new Error(chunkRes.message || `分片${chunkIndex + 1}上传失败`);
+
+            uploadedCount++;
+            const progress = Math.round((uploadedCount / totalChunks) * 100);
+            if (options.onProgress) options.onProgress(progress);
+
+            return;
+          } catch (err) {
+            lastErr = err;
+            console.warn(`[chunk-cloud] 分片 ${chunkIndex} 第${attempt + 1}次尝试失败:`, err.message);
+            if (attempt < 2) {
+              await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
+            }
+          }
+        }
+
+        throw lastErr || new Error(`分片 ${chunkIndex + 1} 上传失败`);
+      };
+
+      const activeUploads = new Set();
+      while (nextChunkIndex < totalChunks || activeUploads.size > 0) {
+        while (activeUploads.size < CONCURRENCY && nextChunkIndex < totalChunks) {
+          const idx = nextChunkIndex++;
+          const p = uploadOneChunk(idx).then(() => {
+            activeUploads.delete(p);
+          }).catch((err) => {
+            activeUploads.delete(p);
+            throw err;
+          });
+          activeUploads.add(p);
+        }
+        if (activeUploads.size > 0) {
+          await Promise.race(activeUploads);
+        }
+      }
+
+      // 4. 完成
+      const completeRes = await requestPromise({
+        url: `${apiBase}/upload-chunk-complete`,
+        method: 'POST',
+        header: { ...configHeaders, 'Content-Type': 'application/json' },
+        data: { uploadId, fileName, totalChunks },
+      });
+      if (completeRes.code !== 0) throw new Error(completeRes.message || '完成上传失败');
+
+      console.log(`[chunk-cloud] 上传成功: ${fileName}`);
+      if (options.onProgress) options.onProgress(100);
+      resolve(completeRes);
+
+    } catch (err) {
+      console.error('[chunk-cloud] 分片上传失败:', err.message);
+      reject(err);
+    }
+  });
+}
+
+/**
+ * 辅助：wx.request 返回 Promise
+ */
+function requestPromise(opts) {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      ...opts,
+      timeout: opts.timeout || 30000,
+      success: (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) resolve(res.data);
+        else reject(new Error(res.data?.message || `HTTP ${res.statusCode}`));
+      },
+      fail: (err) => {
+        reject(new Error(err.errMsg || JSON.stringify(err)));
+      },
+    });
+  });
+}
 
 /**
  * 获取文件列表
