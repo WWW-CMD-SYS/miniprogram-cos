@@ -11,12 +11,7 @@ Page({
     fileList: [],
     selectedFiles: [],
     uploadQueue: [],
-    currentPage: 1,
-    pageSize: 10,
-    // 计算属性需要手动放在 data 中
-    paginatedFiles: [],
     filteredFiles: [],
-    totalPages: 0,
     isAllSelected: false,
     // 搜索相关
     searchKeyword: ''
@@ -74,7 +69,6 @@ Page({
   onSearchInput(e) {
     const keyword = e.detail.value || '';
     this.setData({ searchKeyword: keyword });
-    this.setData({ currentPage: 1 }); // 重置到第一页
     this.updateComputed();
   },
 
@@ -82,20 +76,18 @@ Page({
   onSearchConfirm(e) {
     const keyword = e.detail.value || '';
     this.setData({ searchKeyword: keyword });
-    this.setData({ currentPage: 1 });
     this.updateComputed();
   },
 
   // 清除搜索
   clearSearch() {
     this.setData({ searchKeyword: '' });
-    this.setData({ currentPage: 1 });
     this.updateComputed();
   },
 
-  // 计算分页和选中状态（包含过滤逻辑）
+  // 计算过滤和选中状态
   updateComputed() {
-    const { fileList, selectedFiles, currentPage, pageSize, searchKeyword } = this.data;
+    const { fileList, selectedFiles, searchKeyword } = this.data;
 
     // 根据关键词过滤文件
     let filtered = fileList;
@@ -106,25 +98,18 @@ Page({
       );
     }
 
-    // 计算分页数据，并给每个文件添加 selected 属性
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    const safePage = Math.min(currentPage, totalPages);
-    const start = (safePage - 1) * pageSize;
-    const end = start + pageSize;
-    const paginatedFiles = filtered.slice(start, end).map(f => ({
+    // 给每个文件添加 selected 属性
+    const filesWithSelected = filtered.map(f => ({
       ...f,
       selected: selectedFiles.includes(f.key)
     }));
 
-    // 计算是否全选（基于当前页）
-    const isAllSelected = paginatedFiles.length > 0 && paginatedFiles.every(f => f.selected);
+    // 计算是否全选
+    const isAllSelected = filesWithSelected.length > 0 && filesWithSelected.every(f => f.selected);
 
     this.setData({
-      filteredFiles: filtered,
-      paginatedFiles,
-      totalPages,
-      isAllSelected,
-      currentPage: safePage
+      filteredFiles: filesWithSelected,
+      isAllSelected
     });
   },
 
@@ -170,7 +155,6 @@ Page({
         this.setData({
           fileList: files,
           selectedFiles: [],
-          currentPage: 1,
           searchKeyword: '' // 重置搜索
         });
         this.updateComputed();
@@ -184,21 +168,6 @@ Page({
     }
 
     this.setData({ listLoading: false });
-  },
-
-  // 分页
-  prevPage() {
-    if (this.data.currentPage > 1) {
-      this.setData({ currentPage: this.data.currentPage - 1 });
-      this.updateComputed();
-    }
-  },
-
-  nextPage() {
-    if (this.data.currentPage < this.data.totalPages) {
-      this.setData({ currentPage: this.data.currentPage + 1 });
-      this.updateComputed();
-    }
   },
 
   // 选择文件
@@ -218,16 +187,16 @@ Page({
   },
 
   toggleSelectAll() {
-    const paginated = this.data.paginatedFiles;
+    const filtered = this.data.filteredFiles;
     const selected = [...this.data.selectedFiles];
 
     if (this.data.isAllSelected) {
-      paginated.forEach(f => {
+      filtered.forEach(f => {
         const idx = selected.indexOf(f.key);
         if (idx > -1) selected.splice(idx, 1);
       });
     } else {
-      paginated.forEach(f => {
+      filtered.forEach(f => {
         if (!selected.includes(f.key)) selected.push(f.key);
       });
     }

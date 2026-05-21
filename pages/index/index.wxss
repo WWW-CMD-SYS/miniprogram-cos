@@ -300,51 +300,24 @@
   border-radius: 20rpx;
 }
 
-/* ========== 搜索框样式 ========== */
-.search-section {
-  padding: 0 24rpx 20rpx;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-}
+/* ========== 搜索框样式（已移除独立区域，内嵌到表头） ========== */
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-color);
-  border-radius: 40rpx;
-  padding: 16rpx 24rpx;
-  gap: 12rpx;
-  border: 2rpx solid var(--border-color);
-  transition: all 0.2s ease;
-}
-
-.search-bar:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4rpx rgba(0, 82, 217, 0.1);
-}
-
-.search-input {
-  flex: 1;
-  font-size: 28rpx;
-  color: var(--text-primary);
-  height: 48rpx;
-  line-height: 48rpx;
-}
-
-.search-input::placeholder {
-  color: var(--text-placeholder);
-}
-
-.clear-btn {
-  padding: 4rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ========== TDesign 表格样式 ========== */
+/* ========== 表格滚动容器 ========== */
 .table-wrapper {
   padding: 0;
-  overflow-x: auto;
+}
+
+.table-header-fixed {
+  /* 表头固定在顶部 */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--bg-color);
+}
+
+.table-body-scroll {
+  max-height: 1100rpx;
+  overflow-y: auto;
 }
 
 .selected-row {
@@ -532,38 +505,19 @@
   margin-top: 20rpx;
 }
 
-/* ========== 分页 ========== */
-.pagination {
-  padding: 24rpx;
+/* ========== 列表底部 ========== */
+.list-footer {
+  padding: 20rpx;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 24rpx;
   background-color: var(--card-bg);
   border-top: 1rpx solid var(--border-color);
 }
 
-.page-indicator {
-  display: flex;
-  align-items: baseline;
-  gap: 4rpx;
-  padding: 0 16rpx;
-}
-
-.page-current {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--primary-color);
-}
-
-.page-separator {
+.footer-text {
   font-size: 24rpx;
   color: var(--text-placeholder);
-}
-
-.page-total {
-  font-size: 24rpx;
-  color: var(--text-secondary);
 }
 
 /* ========== 原生表格样式 ========== */
@@ -611,9 +565,62 @@
   overflow: hidden;
 }
 
+/* 文件名列头（标签 + 搜索框同行，flex 布局不重叠） */
+.th-name {
+  flex-direction: row;
+  align-items: center;
+  gap: 24rpx;
+  padding: 12rpx 12rpx;
+}
+
+.th-label {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 内嵌搜索栏（自适应填充，含搜索图标） */
+.inline-search {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-radius: 20rpx;
+  padding: 12rpx 16rpx;
+  gap: 8rpx;
+  border: 2rpx solid var(--border-color);
+  transition: border-color 0.2s;
+  flex: 1;
+  min-width: 0;
+}
+
+.inline-search:focus-within {
+  border-color: var(--primary-color);
+}
+
+.inline-search-input {
+  flex: 1;
+  font-size: 24rpx;
+  color: var(--text-primary);
+  height: 40rpx;
+  line-height: 40rpx;
+}
+
+.inline-search-input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.clear-btn {
+  padding: 2rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .th-action, .td-action {
-  width: 220rpx;
-  min-width: 220rpx;
+  width: 200rpx;
+  min-width: 200rpx;
   justify-content: center;
   flex-shrink: 0;
 }
