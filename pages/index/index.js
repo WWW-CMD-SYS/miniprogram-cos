@@ -98,6 +98,13 @@ Page({
       );
     }
 
+    // 按上传时间由近至远排序（lastModified / LastModified 字段）
+    filtered = [...filtered].sort((a, b) => {
+      const timeA = new Date(a.lastModified || a.LastModified || 0).getTime();
+      const timeB = new Date(b.lastModified || b.LastModified || 0).getTime();
+      return timeB - timeA;
+    });
+
     // 给每个文件添加 selected 属性
     const filesWithSelected = filtered.map(f => ({
       ...f,
