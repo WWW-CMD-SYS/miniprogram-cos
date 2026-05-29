@@ -13,11 +13,11 @@
             </view>
             <view class="header-actions">
                 <view class="action-btn-group">
-                    <view class="action-btn-item" bindtap="openConfig">
+                    <view class="action-btn-item" bind:tap="openConfig">
                         <t-icon name="setting" size="32rpx" color="#ffffff"/>
                         <text class="action-btn-text">配置</text>
                     </view>
-                    <view class="action-btn-item action-btn-primary" bindtap="fetchFileList">
+                    <view class="action-btn-item action-btn-primary" bind:tap="fetchFileList">
                         <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
                         <text class="action-btn-text">刷新</text>
                     </view>
@@ -30,7 +30,7 @@
     <view class="upload-section card">
         <view class="upload-btn-wrap">
             <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn"
-                      bindtap="showUploadSource">选择文件上传
+                      bind:tap="showUploadSource">选择文件上传
             </t-button>
         </view>
         <text class="upload-tip">支持所有文件类型上传，建议一次不超过 10 份</text>
@@ -64,7 +64,7 @@
                 <view class="selected-badge">
                     <text>已选 {{ selectedFiles.length }}</text>
                 </view>
-                <t-button theme="danger" size="small" variant="outline" icon="delete" bindtap="batchDelete">批量删除
+                <t-button theme="danger" size="small" variant="outline" icon="delete" bind:tap="batchDelete">批量删除
                 </t-button>
             </view>
         </view>
