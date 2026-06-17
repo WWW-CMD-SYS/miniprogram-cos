@@ -1,7 +1,8 @@
 // pages/index/index.js
-import { loadConfig, hasConfig } from '../../utils/config';
+import { hasConfig } from '../../utils/config';
 import { listFiles, deleteFile as apiDeleteFile, deleteFiles as apiDeleteFiles, uploadFile } from '../../utils/cos';
-import { formatSize, getFileType } from '../../utils/format';
+import { getFileType } from '../../utils/format';
+import { startTracking, stopTracking, getCurrentPosition, getTrackingStatus } from '../../utils/location';
 import Toast from 'tdesign-miniprogram/toast/index';
 
 Page({
@@ -14,9 +15,16 @@ Page({
     filteredFiles: [],
     isAllSelected: false,
     // 搜索相关
-    searchKeyword: ''
+    searchKeyword: '',
+    // 物流追踪相关
+    isTracking: false,
+    currentPosition: null,
   },
 
+  /**
+   * 页面加载生命周期
+   * 初始化主题，检查 COS 配置，有配置则拉取文件列表，否则引导去配置页
+   */
   onLoad() {
     this.initTheme();
     if (hasConfig()) {
@@ -29,20 +37,32 @@ Page({
     }
   },
 
+  /**
+   * 页面显示生命周期
+   * 每次切回页面时刷新文件列表（仅当列表为空时），并恢复物流追踪状态
+   */
   onShow() {
     if (hasConfig() && this.data.fileList.length === 0) {
       this.fetchFileList();
     }
+    // 恢复追踪状态显示
+    this.setData({ isTracking: getTrackingStatus() });
   },
 
-  // 初始化主题
+  /**
+   * 初始化主题
+   * 从本地存储读取主题偏好，默认深色模式
+   */
   initTheme() {
     const saved = wx.getStorageSync('cos_manager_theme');
     this.setData({ isDark: saved !== 'light' });
     this.applyTheme(this.data.isDark);
   },
 
-  // 应用主题
+  /**
+   * 应用主题到当前页面
+   * @param {boolean} isDark - 是否为深色模式
+   */
   applyTheme(isDark) {
     wx.setStorageSync('cos_manager_theme', isDark ? 'dark' : 'light');
     const pages = getCurrentPages();
@@ -52,7 +72,9 @@ Page({
     }
   },
 
-  // 切换主题
+  /**
+   * 切换深色/浅色主题（工具方法，暂未在页面中绑定）
+   */
   toggleTheme() {
     const newDark = !this.data.isDark;
     this.setData({ isDark: newDark });
@@ -60,32 +82,44 @@ Page({
     Toast({ message: newDark ? '已切换到深色模式' : '已切换到浅色模式', theme: 'success' });
   },
 
-  // 打开配置页
+  /**
+   * 跳转到 COS 配置页面
+   */
   openConfig() {
     wx.navigateTo({ url: '/pages/config/index' });
   },
 
-  // 搜索输入处理
+  /**
+   * 搜索框输入事件
+   * 实时根据关键词过滤文件列表
+   */
   onSearchInput(e) {
     const keyword = e.detail.value || '';
     this.setData({ searchKeyword: keyword });
     this.updateComputed();
   },
 
-  // 搜索确认（键盘回车）
+  /**
+   * 搜索确认（键盘回车）
+   */
   onSearchConfirm(e) {
     const keyword = e.detail.value || '';
     this.setData({ searchKeyword: keyword });
     this.updateComputed();
   },
 
-  // 清除搜索
+  /**
+   * 清除搜索关键词，恢复完整列表
+   */
   clearSearch() {
     this.setData({ searchKeyword: '' });
     this.updateComputed();
   },
 
-  // 计算过滤和选中状态
+  /**
+   * 核心计算：根据搜索关键词过滤、排序，并计算全选状态
+   * 排序规则：按上传时间由近至远
+   */
   updateComputed() {
     const { fileList, selectedFiles, searchKeyword } = this.data;
 
@@ -120,7 +154,10 @@ Page({
     });
   },
 
-  // 加载文件列表
+  /**
+   * 从后端拉取 COS 存储桶文件列表
+   * 对返回的文件名做解码处理，重置搜索和选中状态
+   */
   async fetchFileList() {
     if (!hasConfig()) {
       Toast({ message: '请先配置 COS 参数', theme: 'warning' });
@@ -156,9 +193,6 @@ Page({
           };
         });
 
-        console.log('文件列表原始数据:', res.data.files);
-        console.log('处理后文件列表:', files);
-
         this.setData({
           fileList: files,
           selectedFiles: [],
@@ -177,7 +211,10 @@ Page({
     this.setData({ listLoading: false });
   },
 
-  // 选择文件
+  /**
+   * 切换单个文件的选中状态
+   * @param {Object} e - 事件对象，需携带 data-key
+   */
   toggleSelect(e) {
     const key = e.currentTarget.dataset.key;
     const selected = [...this.data.selectedFiles];
@@ -193,6 +230,82 @@ Page({
     this.updateComputed();
   },
 
+  // ==================== 物流位置追踪 ====================
+
+  /**
+   * 切换物流追踪的启动/停止状态
+   */
+  toggleTracking() {
+    if (this.data.isTracking) {
+      this.stopLocationTracking();
+    } else {
+      this.startLocationTracking();
+    }
+  },
+
+  /**
+   * 开始持续上报位置到物流服务器
+   *
+   * ⚠️ 启动前请先确保：
+   *   1. 物流坐标中转服务已启动：node server/location-server.js
+   *   2. 将 DEFAULT_SERVER 替换为你的电脑局域网 IP
+   *   3. 微信开发者工具 → 详情 → 不校验合法域名（勾选）
+   */
+  startLocationTracking() {
+    // 替换为你的服务器地址
+    // 查看本机IP：ifconfig | grep "inet " | grep -v 127.0.0.1
+    const serverUrl = 'http://101.43.98.105:3001';
+
+    startTracking({
+      deviceId: 'truck-001',
+      serverUrl: serverUrl,
+      interval: 30000,
+      onUpdate: (pos) => {
+        this.setData({
+          currentPosition: pos
+        });
+      }
+    });
+
+    this.setData({ isTracking: true });
+    wx.showToast({ title: '已开始追踪', icon: 'success', duration: 1500 });
+  },
+
+  /**
+   * 停止物流位置追踪
+   * 清除追踪状态和当前位置信息
+   */
+  stopLocationTracking() {
+    stopTracking();
+    this.setData({
+      isTracking: false,
+      currentPosition: null
+    });
+    wx.showToast({ title: '已停止追踪', icon: 'none', duration: 1500 });
+  },
+
+  /**
+   * 单次获取当前位置并弹窗显示（调试用，页面中已注释）
+   */
+  clickMe() {
+    getCurrentPosition()
+      .then(pos => {
+        console.log('位置为：', pos.lat, pos.lng);
+        wx.showModal({
+          title: '当前位置',
+          content: `纬度：${pos.lat.toFixed(6)}\n经度：${pos.lng.toFixed(6)}`,
+          showCancel: false,
+          confirmText: '确定'
+        });
+      })
+      .catch(() => {
+        wx.showToast({ title: '定位失败，请检查权限设置', icon: 'none' });
+      });
+  },
+
+  /**
+   * 全选/取消全选当前过滤后的文件列表
+   */
   toggleSelectAll() {
     const filtered = this.data.filteredFiles;
     const selected = [...this.data.selectedFiles];
@@ -212,7 +325,10 @@ Page({
     this.updateComputed();
   },
 
-  // 打开文件详情
+  /**
+   * 跳转到文件详情页
+   * @param {Object} e - 事件对象，需携带 data-file（文件完整信息）
+   */
   openFile(e) {
     const file = e.currentTarget.dataset.file;
     wx.navigateTo({
@@ -220,7 +336,12 @@ Page({
     });
   },
 
-  // 预览文件
+  /**
+   * 预览文件
+   * 根据文件类型选择预览方式：图片用 previewImage，视频用 previewMedia，
+   * PDF/Office 先下载再用 openDocument 打开
+   * @param {Object} e - 事件对象，需携带 data-file
+   */
   previewFile(e) {
     const file = e.currentTarget.dataset.file;
     if (!file.url) {
@@ -284,7 +405,11 @@ Page({
     }
   },
 
-  // 下载文件
+  /**
+   * 下载文件
+   * 图片类型保存到相册，其他类型用 openDocument 打开
+   * @param {Object} e - 事件对象，需携带 data-file
+   */
   downloadFile(e) {
     const file = e.currentTarget.dataset.file;
     if (!file.url) {
@@ -340,7 +465,10 @@ Page({
     });
   },
 
-  // 删除文件
+  /**
+   * 删除单个文件（带二次确认弹窗）
+   * @param {Object} e - 事件对象，需携带 data-file
+   */
   deleteFile(e) {
     const file = e.currentTarget.dataset.file;
     wx.showModal({
@@ -366,7 +494,10 @@ Page({
     });
   },
 
-  // 批量删除
+  /**
+   * 批量删除选中的文件（带二次确认）
+   * 优先使用批量删除接口，失败时降级为逐个删除
+   */
   batchDelete() {
     if (this.data.selectedFiles.length === 0) {
       Toast({ message: '请先选择要删除的文件', theme: 'warning' });
@@ -428,7 +559,9 @@ Page({
     });
   },
 
-  // 显示上传来源选择菜单
+  /**
+   * 弹出上传来源选择菜单（相册 / 微信聊天文件）
+   */
   showUploadSource() {
     if (!hasConfig()) {
       Toast({ message: '请先配置 COS 参数', theme: 'warning' });
@@ -453,7 +586,10 @@ Page({
     });
   },
 
-  // 从相册选择（图片和视频）
+  /**
+   * 从相册选择图片/视频上传
+   * 使用 wx.chooseMedia 统一选择，上传前自动按时间戳命名
+   */
   chooseFromAlbum() {
     // 统一使用 chooseMedia，避免真机上同时调用 chooseImage + chooseMedia 的冲突
     wx.chooseMedia({
@@ -495,7 +631,10 @@ Page({
     });
   },
 
-  // 从微信聊天选择（所有文件类型）
+  /**
+   * 从微信聊天记录中选择文件上传
+   * 使用 wx.chooseMessageFile，支持所有文件类型，保留原始文件名
+   */
   chooseFromChat() {
     wx.chooseMessageFile({
       count: 10,
@@ -522,7 +661,11 @@ Page({
     });
   },
 
-  // 上传文件
+  /**
+   * 执行文件上传（逐个串行上传）
+   * 上传完成后延迟 1.5 秒清空队列并刷新文件列表
+   * @param {Array} queue - 待上传文件队列，每项包含 path、name 字段
+   */
   async uploadFiles(queue) {
     for (let i = 0; i < queue.length; i++) {
       const file = queue[i];

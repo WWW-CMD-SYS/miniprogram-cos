@@ -21,6 +21,16 @@
                         <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
                         <text class="action-btn-text">刷新</text>
                     </view>
+                    <t-button
+                            theme="primary"
+                            size="medium"
+                            icon="{{ isTracking ? 'stop-circle' : 'location' }}"
+                            bind:tap="toggleTracking"
+                            class="custom-track-btn {{ isTracking ? 'tracking-active' : 'tracking-btn' }}"
+                    >
+                        {{ isTracking ? '位置上报中' : '开始位置上报'}}
+                        <text class="tracking-dot" wx:if="{{ isTracking }}">●</text>
+                    </t-button>
                 </view>
             </view>
         </view>
@@ -143,7 +153,7 @@
                 </view>
                 <text class="empty-text">存储桶为空</text>
                 <text class="empty-hint">点击上方按钮上传文件</text>
-                <t-button theme="primary" variant="outline" icon="upload" bindtap="chooseFile">上传文件</t-button>
+                <t-button theme="primary" variant="outline" icon="upload" bindtap="showUploadSource">上传文件</t-button>
             </view>
 
             <!-- 加载状态 -->

@@ -16,6 +16,9 @@
   "permission": {
     "scope.writePhotosAlbum": {
       "desc": "用于保存下载的文件到相册"
+    },
+    "scope.userLocation": {
+      "desc": "用于获取当前位置信息"
     }
   },
   "usingComponents": {
