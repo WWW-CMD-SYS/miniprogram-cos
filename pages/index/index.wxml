@@ -35,7 +35,6 @@
                          - 默认态：玻璃底，显示"开始位置上报"
                          - 上报中：青蓝光晕呼吸 + 闪烁圆点，显示"位置上报中" -->
                     <t-button
-                        size="medium"
                         icon="{{ isTracking ? '' : 'location' }}"
                         bind:tap="toggleTracking"
                         class="track-btn {{ isTracking ? 'track-btn--active' : '' }}"

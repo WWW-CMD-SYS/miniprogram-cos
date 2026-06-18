@@ -157,7 +157,7 @@
   box-shadow: 0 4rpx 12rpx rgba(0, 82, 217, 0.2);
   transition: all 0.25s ease !important;
   padding: 0 24rpx !important;
-  height: 64rpx !important;
+  height: 75rpx !important;
 }
 
 /* t-button 内部文字容器 */
