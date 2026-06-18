@@ -138,65 +138,56 @@
 }
 
 /* ================================================
-   位置上报按钮 — 科技玻璃态设计
+   位置上报按钮 — 基于 TDesign t-button 科技玻璃态设计
    ================================================
-
-   设计思路：
-   - 与"配置/刷新"保持完全一致的尺寸、圆角、内边距；
-   - 默认态：白色半透明玻璃底 + 冷光细描边，左侧定位图标；
+   
+   使用 t-button + 自定义 class 覆写，保留科技玻璃风格：
+   - 默认态：白色半透明玻璃底 + 冷光细描边；
    - 上报中：边框转为青蓝高亮，box-shadow 呼吸脉动，
-     文字左侧替换为紧凑闪烁圆点（圆点 + 脉冲环同周期同步）；
-   - 无伪元素遮罩层，布局干净不挤压内容。
+     文字后方追加紧凑闪烁圆点（圆点 + 脉冲环同周期同步）。
 */
 
 .track-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  padding: 16rpx 28rpx;
-  border-radius: 12rpx;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12rpx !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  font-size: 26rpx !important;
   box-shadow: 0 4rpx 12rpx rgba(0, 82, 217, 0.2);
-  transition: all 0.25s ease;
+  transition: all 0.25s ease !important;
+  padding: 0 24rpx !important;
+  height: 64rpx !important;
+}
+
+/* t-button 内部文字容器 */
+.track-btn .t-button__text {
+  color: #ffffff !important;
+  font-size: 26rpx !important;
+  font-weight: 500 !important;
+}
+
+/* t-button 内部图标颜色 */
+.track-btn .t-icon {
+  color: #ffffff !important;
 }
 
 .track-btn:active {
   transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.22) !important;
 }
 
-.track-btn-text {
-  font-size: 30rpx;
-  font-weight: 500;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-/* ---------- 上报中激活态：青蓝高亮边框 + 呼吸光晕 ---------- */
+/* ---------- 上报中激活态：青蓝高亮边框 + 静态光晕（不抖动） ---------- */
 .track-btn--active {
-  background: rgba(0, 200, 255, 0.18);
-  border-color: rgba(0, 220, 255, 0.65);
-  animation: track-btn-glow 1.8s ease-in-out infinite;
+  background: rgba(0, 200, 255, 0.18) !important;
+  border-color: rgba(0, 220, 255, 0.65) !important;
+  box-shadow:
+    0 0 16rpx rgba(0, 210, 255, 0.35),
+    0 4rpx 16rpx rgba(0, 130, 255, 0.25);
 }
 
 .track-btn--active:active {
-  background: rgba(0, 200, 255, 0.28);
-}
-
-/* 光晕呼吸（与圆点闪烁同周期 1.8s） */
-@keyframes track-btn-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 10rpx rgba(0, 200, 255, 0.2),
-      0 4rpx 14rpx rgba(0, 114, 255, 0.2);
-  }
-  50% {
-    box-shadow:
-      0 0 22rpx rgba(0, 210, 255, 0.45),
-      0 4rpx 18rpx rgba(0, 130, 255, 0.3);
-  }
+  background: rgba(0, 200, 255, 0.28) !important;
 }
 
 /* ========== 闪烁圆点指示器（紧凑版，同周期 1.8s） ==========
@@ -210,10 +201,11 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  /* 容器与圆点等宽，不额外占用空间 */
-  width: 24rpx;
-  height: 24rpx;
+  width: 40rpx;
+  height: 40rpx;
   flex-shrink: 0;
+  margin-left: 8rpx;
+  vertical-align: middle;
 }
 
 /* 脉冲扩散环：从圆点尺寸向外扩散消隐 */
@@ -221,26 +213,23 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  /* 初始尺寸与圆点一致（16rpx 直径） */
-  width: 16rpx;
-  height: 16rpx;
-  margin: -8rpx 0 0 -8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  margin: -18rpx 0 0 -18rpx;
   border-radius: 50%;
-  border: 2rpx solid rgba(0, 229, 255, 0.8);
-  /* 同周期 1.8s，与圆点闪烁节拍对齐 */
+  border: 3rpx solid rgba(0, 229, 255, 0.9);
   animation: dot-ring-pulse 1.8s ease-out infinite;
 }
 
-/* 圆点本体：用 view 实现（更稳定，不受字体行高影响） */
+/* 圆点本体：闪烁高亮 */
 .tracking-dot {
-  width: 12rpx;
-  height: 12rpx;
+  width: 22rpx;
+  height: 22rpx;
   border-radius: 50%;
   background: #00e5ff;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  /* 同周期 1.8s */
   animation: dot-blink 1.8s ease-in-out infinite;
 }
 
@@ -249,22 +238,22 @@
   0%, 100% {
     opacity: 1;
     box-shadow:
-      0 0 8rpx rgba(0, 229, 255, 1),
-      0 0 16rpx rgba(0, 210, 255, 0.7),
-      0 0 28rpx rgba(0, 180, 255, 0.4);
+      0 0 12rpx rgba(0, 229, 255, 1),
+      0 0 24rpx rgba(0, 210, 255, 0.85),
+      0 0 40rpx rgba(0, 180, 255, 0.6);
   }
   50% {
-    opacity: 0.25;
+    opacity: 0.2;
     box-shadow:
       0 0 4rpx rgba(0, 229, 255, 0.4),
       0 0 8rpx rgba(0, 210, 255, 0.15);
   }
 }
 
-/* 脉冲环：从原点扩散至 2.8× 后消隐，周期 1.8s */
+/* 脉冲环：从原点扩散至 2.5× 后消隐，周期 1.8s */
 @keyframes dot-ring-pulse {
-  0%   { transform: scale(1);   opacity: 0.85; }
-  100% { transform: scale(2.8); opacity: 0; }
+  0%   { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
 /* ========== 上传区域 ========== */

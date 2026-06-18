@@ -31,24 +31,22 @@
                         <text class="action-btn-text">刷新</text>
                     </view>
 
-                    <!-- 位置上报按钮：切换 GPS 位置上报开关
-                         - 默认态：渐变蓝，显示"开始位置上报"
+                    <!-- 位置上报按钮：TDesign 组件
+                         - 默认态：玻璃底，显示"开始位置上报"
                          - 上报中：青蓝光晕呼吸 + 闪烁圆点，显示"位置上报中" -->
-                    <view
-                        class="track-btn {{ isTracking ? 'track-btn--active' : '' }}"
+                    <t-button
+                        size="medium"
+                        icon="{{ isTracking ? '' : 'location' }}"
                         bind:tap="toggleTracking"
+                        class="track-btn {{ isTracking ? 'track-btn--active' : '' }}"
                     >
-                        <!-- 上报中：脉冲圆点指示器（环与点同周期闪烁） -->
+                        {{ isTracking ? '位置上报中' : '开始位置上报' }}
+                        <!-- 上报中：脉冲圆点指示器（放在按钮默认 slot 内容内） -->
                         <view wx:if="{{ isTracking }}" class="tracking-dot-wrap">
                             <view class="tracking-dot-ring"></view>
                             <view class="tracking-dot"></view>
                         </view>
-                        <!-- 默认态：定位图标 -->
-                        <t-icon wx:else name="location" size="30rpx" color="#ffffff"/>
-                        <text class="track-btn-text">
-                            {{ isTracking ? '位置上报中' : '开始位置上报' }}
-                        </text>
-                    </view>
+                    </t-button>
 
                 </view>
             </view>
