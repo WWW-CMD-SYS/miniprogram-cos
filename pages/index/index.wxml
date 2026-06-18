@@ -42,7 +42,6 @@
                         {{ isTracking ? '位置上报中' : '开始位置上报' }}
                         <!-- 上报中：脉冲圆点指示器（放在按钮默认 slot 内容内） -->
                         <view wx:if="{{ isTracking }}" class="tracking-dot-wrap">
-                            <view class="tracking-dot-ring"></view>
                             <view class="tracking-dot"></view>
                         </view>
                     </t-button>

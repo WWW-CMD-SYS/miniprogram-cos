@@ -177,24 +177,24 @@
   background: rgba(255, 255, 255, 0.22) !important;
 }
 
-/* ---------- 上报中激活态：青蓝高亮边框 + 静态光晕（不抖动） ---------- */
+/* ---------- 上报中激活态：珊瑚橙高亮边框 + 静态光晕（不抖动） ---------- */
 .track-btn--active {
-  background: rgba(0, 200, 255, 0.18) !important;
-  border-color: rgba(0, 220, 255, 0.65) !important;
+  background: rgba(255, 127, 65, 0.18) !important;
+  border-color: rgba(255, 127, 65, 0.65) !important;
   box-shadow:
-    0 0 16rpx rgba(0, 210, 255, 0.35),
-    0 4rpx 16rpx rgba(0, 130, 255, 0.25);
+    0 0 16rpx rgba(255, 127, 65, 0.35),
+    0 4rpx 16rpx rgba(255, 100, 40, 0.25);
 }
 
 .track-btn--active:active {
-  background: rgba(0, 200, 255, 0.28) !important;
+  background: rgba(255, 127, 65, 0.28) !important;
 }
 
-/* ========== 闪烁圆点指示器（紧凑版，同周期 1.8s） ==========
+/* ========== 闪烁圆点指示器（京东珊瑚橙，同周期 1.8s） ==========
 
    结构：.tracking-dot-wrap 为固定尺寸正方形容器，
-   圆点 (.tracking-dot) 居中叠在脉冲环 (.tracking-dot-ring) 上方；
-   两者使用相同动画周期 1.8s，视觉节拍一致。
+   圆点 (.tracking-dot) 居中显示；
+   使用闪烁动画 1.5s，视觉节拍一。
 */
 .tracking-dot-wrap {
   display: inline-flex;
@@ -204,33 +204,19 @@
   width: 40rpx;
   height: 40rpx;
   flex-shrink: 0;
-  margin-left: 8rpx;
+  margin-left: 10rpx;
   vertical-align: middle;
 }
-
-/* 脉冲扩散环：从圆点尺寸向外扩散消隐 */
-.tracking-dot-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 36rpx;
-  height: 36rpx;
-  margin: -18rpx 0 0 -18rpx;
-  border-radius: 50%;
-  border: 3rpx solid rgba(0, 229, 255, 0.9);
-  animation: dot-ring-pulse 1.8s ease-out infinite;
-}
-
-/* 圆点本体：闪烁高亮 */
+/* 圆点本体：闪烁高亮（京东珊瑚橙） */
 .tracking-dot {
-  width: 22rpx;
-  height: 22rpx;
+  width: 30rpx;
+  height: 30rpx;
   border-radius: 50%;
-  background: #00e5ff;
+  background: #FF7F41;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  animation: dot-blink 1.8s ease-in-out infinite;
+  animation: dot-blink 1.5s ease-in-out infinite;
 }
 
 /* 圆点闪烁：亮 → 暗，周期 1.8s */
@@ -238,15 +224,15 @@
   0%, 100% {
     opacity: 1;
     box-shadow:
-      0 0 12rpx rgba(0, 229, 255, 1),
-      0 0 24rpx rgba(0, 210, 255, 0.85),
-      0 0 40rpx rgba(0, 180, 255, 0.6);
+      0 0 12rpx rgba(255, 127, 65, 1),
+      0 0 24rpx rgba(255, 140, 80, 0.85),
+      0 0 40rpx rgba(255, 100, 40, 0.6);
   }
   50% {
     opacity: 0.2;
     box-shadow:
-      0 0 4rpx rgba(0, 229, 255, 0.4),
-      0 0 8rpx rgba(0, 210, 255, 0.15);
+      0 0 4rpx rgba(255, 127, 65, 0.4),
+      0 0 8rpx rgba(255, 140, 80, 0.15);
   }
 }
 
