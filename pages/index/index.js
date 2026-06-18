@@ -2,7 +2,7 @@
 import { hasConfig } from '../../utils/config';
 import { listFiles, deleteFile as apiDeleteFile, deleteFiles as apiDeleteFiles, uploadFile } from '../../utils/cos';
 import { getFileType } from '../../utils/format';
-import { startTracking, stopTracking, getCurrentPosition, getTrackingStatus } from '../../utils/location';
+import { startTracking, stopTracking, getTrackingStatus } from '../../utils/location';
 import Toast from 'tdesign-miniprogram/toast/index';
 
 Page({
@@ -18,7 +18,6 @@ Page({
     searchKeyword: '',
     // 物流追踪相关
     isTracking: false,
-    currentPosition: null,
   },
 
   /**
@@ -261,9 +260,8 @@ Page({
       serverUrl: serverUrl,
       interval: 30000,
       onUpdate: (pos) => {
-        this.setData({
-          currentPosition: pos
-        });
+        // 位置更新回调（可用于后续轨迹展示等扩展）
+        console.log('[Page] 位置已更新:', pos.lng, pos.lat);
       }
     });
 
@@ -273,34 +271,12 @@ Page({
 
   /**
    * 停止物流位置追踪
-   * 清除追踪状态和当前位置信息
+   * 清除追踪状态，停止位置监听
    */
   stopLocationTracking() {
     stopTracking();
-    this.setData({
-      isTracking: false,
-      currentPosition: null
-    });
+    this.setData({ isTracking: false });
     wx.showToast({ title: '已停止追踪', icon: 'none', duration: 1500 });
-  },
-
-  /**
-   * 单次获取当前位置并弹窗显示（调试用，页面中已注释）
-   */
-  clickMe() {
-    getCurrentPosition()
-      .then(pos => {
-        console.log('位置为：', pos.lat, pos.lng);
-        wx.showModal({
-          title: '当前位置',
-          content: `纬度：${pos.lat.toFixed(6)}\n经度：${pos.lng.toFixed(6)}`,
-          showCancel: false,
-          confirmText: '确定'
-        });
-      })
-      .catch(() => {
-        wx.showToast({ title: '定位失败，请检查权限设置', icon: 'none' });
-      });
   },
 
   /**

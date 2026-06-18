@@ -143,8 +143,8 @@
    
    使用 t-button + 自定义 class 覆写，保留科技玻璃风格：
    - 默认态：白色半透明玻璃底 + 冷光细描边；
-   - 上报中：边框转为青蓝高亮，box-shadow 呼吸脉动，
-     文字后方追加紧凑闪烁圆点（圆点 + 脉冲环同周期同步）。
+   - 上报中：边框转为珊瑚橙高亮，box-shadow 静态光晕，
+     文字后方追加紧凑闪烁圆点。
 */
 
 .track-btn {
@@ -190,11 +190,10 @@
   background: rgba(255, 127, 65, 0.28) !important;
 }
 
-/* ========== 闪烁圆点指示器（京东珊瑚橙，同周期 1.8s） ==========
+/* ========== 闪烁圆点指示器（京东珊瑚橙，1.5s 闪烁周期） ==========
 
    结构：.tracking-dot-wrap 为固定尺寸正方形容器，
-   圆点 (.tracking-dot) 居中显示；
-   使用闪烁动画 1.5s，视觉节拍一。
+   圆点 (.tracking-dot) 居中显示，使用 box-shadow 实现三层光晕闪烁。
 */
 .tracking-dot-wrap {
   display: inline-flex;
@@ -219,7 +218,7 @@
   animation: dot-blink 1.5s ease-in-out infinite;
 }
 
-/* 圆点闪烁：亮 → 暗，周期 1.8s */
+/* 圆点闪烁：亮 → 暗，周期 1.5s（三档 box-shadow 光晕同步呼吸） */
 @keyframes dot-blink {
   0%, 100% {
     opacity: 1;
@@ -234,12 +233,6 @@
       0 0 4rpx rgba(255, 127, 65, 0.4),
       0 0 8rpx rgba(255, 140, 80, 0.15);
   }
-}
-
-/* 脉冲环：从原点扩散至 2.5× 后消隐，周期 1.8s */
-@keyframes dot-ring-pulse {
-  0%   { transform: scale(1);   opacity: 0.9; }
-  100% { transform: scale(2.5); opacity: 0; }
 }
 
 /* ========== 上传区域 ========== */
