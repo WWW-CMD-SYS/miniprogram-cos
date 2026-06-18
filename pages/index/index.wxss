@@ -1,10 +1,15 @@
+/* ================================================
+   COS 文件管理器 - 页面样式
+   风格：科技蓝 · 玻璃拟态 · 流光动效
+   ================================================ */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--bg-color);
   padding-bottom: 40rpx;
 }
 
-/* ========== 头部样式 ========== */
+/* ========== 头部导航栏 ========== */
 .header {
   background: linear-gradient(135deg, #0052d9 0%, #4364f7 50%, #6fb1fc 100%);
   color: #ffffff;
@@ -25,6 +30,7 @@
   min-width: 280rpx;
 }
 
+/* Logo 区域 */
 .logo-area {
   display: flex;
   align-items: center;
@@ -59,6 +65,7 @@
   opacity: 0.85;
 }
 
+/* 右侧操作区 */
 .header-actions {
   display: flex;
   align-items: center;
@@ -66,13 +73,13 @@
   flex-wrap: wrap;
 }
 
-/* 自定义操作按钮组 */
 .action-btn-group {
   display: flex;
   gap: 16rpx;
   align-items: center;
 }
 
+/* 通用操作按钮（配置 / 刷新） */
 .action-btn-item {
   display: flex;
   align-items: center;
@@ -91,6 +98,7 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* 刷新按钮高亮变体 */
 .action-btn-primary {
   background: rgba(255, 255, 255, 0.95);
   border-color: transparent;
@@ -112,7 +120,7 @@
   color: #0052d9;
 }
 
-/* 刷新按钮图标 */
+/* 刷新图标旋转动画 */
 .refresh-icon {
   font-size: 32rpx;
   color: #0052d9;
@@ -120,18 +128,143 @@
   display: inline-block;
 }
 
-/* 刷新按钮旋转动画 */
 .spinning {
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ================================================
+   位置上报按钮 — 科技玻璃态设计
+   ================================================
+
+   设计思路：
+   - 与"配置/刷新"保持完全一致的尺寸、圆角、内边距；
+   - 默认态：白色半透明玻璃底 + 冷光细描边，左侧定位图标；
+   - 上报中：边框转为青蓝高亮，box-shadow 呼吸脉动，
+     文字左侧替换为紧凑闪烁圆点（圆点 + 脉冲环同周期同步）；
+   - 无伪元素遮罩层，布局干净不挤压内容。
+*/
+
+.track-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 28rpx;
+  border-radius: 12rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(0, 82, 217, 0.2);
+  transition: all 0.25s ease;
+}
+
+.track-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.track-btn-text {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* ---------- 上报中激活态：青蓝高亮边框 + 呼吸光晕 ---------- */
+.track-btn--active {
+  background: rgba(0, 200, 255, 0.18);
+  border-color: rgba(0, 220, 255, 0.65);
+  animation: track-btn-glow 1.8s ease-in-out infinite;
+}
+
+.track-btn--active:active {
+  background: rgba(0, 200, 255, 0.28);
+}
+
+/* 光晕呼吸（与圆点闪烁同周期 1.8s） */
+@keyframes track-btn-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 10rpx rgba(0, 200, 255, 0.2),
+      0 4rpx 14rpx rgba(0, 114, 255, 0.2);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    box-shadow:
+      0 0 22rpx rgba(0, 210, 255, 0.45),
+      0 4rpx 18rpx rgba(0, 130, 255, 0.3);
   }
+}
+
+/* ========== 闪烁圆点指示器（紧凑版，同周期 1.8s） ==========
+
+   结构：.tracking-dot-wrap 为固定尺寸正方形容器，
+   圆点 (.tracking-dot) 居中叠在脉冲环 (.tracking-dot-ring) 上方；
+   两者使用相同动画周期 1.8s，视觉节拍一致。
+*/
+.tracking-dot-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* 容器与圆点等宽，不额外占用空间 */
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
+}
+
+/* 脉冲扩散环：从圆点尺寸向外扩散消隐 */
+.tracking-dot-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 初始尺寸与圆点一致（16rpx 直径） */
+  width: 16rpx;
+  height: 16rpx;
+  margin: -8rpx 0 0 -8rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(0, 229, 255, 0.8);
+  /* 同周期 1.8s，与圆点闪烁节拍对齐 */
+  animation: dot-ring-pulse 1.8s ease-out infinite;
+}
+
+/* 圆点本体：用 view 实现（更稳定，不受字体行高影响） */
+.tracking-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #00e5ff;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  /* 同周期 1.8s */
+  animation: dot-blink 1.8s ease-in-out infinite;
+}
+
+/* 圆点闪烁：亮 → 暗，周期 1.8s */
+@keyframes dot-blink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow:
+      0 0 8rpx rgba(0, 229, 255, 1),
+      0 0 16rpx rgba(0, 210, 255, 0.7),
+      0 0 28rpx rgba(0, 180, 255, 0.4);
+  }
+  50% {
+    opacity: 0.25;
+    box-shadow:
+      0 0 4rpx rgba(0, 229, 255, 0.4),
+      0 0 8rpx rgba(0, 210, 255, 0.15);
+  }
+}
+
+/* 脉冲环：从原点扩散至 2.8× 后消隐，周期 1.8s */
+@keyframes dot-ring-pulse {
+  0%   { transform: scale(1);   opacity: 0.85; }
+  100% { transform: scale(2.8); opacity: 0; }
 }
 
 /* ========== 上传区域 ========== */
@@ -144,7 +277,7 @@
   gap: 16rpx;
 }
 
-/* 渐变色上传按钮（时尚靓丽风格）*/
+/* 上传按钮包裹层：渐变底色 + 光影 */
 .upload-btn-wrap {
   width: 100%;
   max-width: 400rpx;
@@ -167,7 +300,7 @@
   background: linear-gradient(135deg, #00a8e8 0%, #005ed9 100%);
 }
 
-/* 按钮内部文字样式 */
+/* 内部 TDesign 按钮透传样式 */
 .upload-inner-btn {
   color: #ffffff !important;
   font-size: 32rpx !important;
@@ -183,6 +316,7 @@
   margin-top: 8rpx;
 }
 
+/* 上传队列列表 */
 .upload-queue {
   width: 100%;
   margin-top: 16rpx;
@@ -236,13 +370,14 @@
   background: rgba(213, 73, 65, 0.1);
 }
 
-/* ========== 文件列表 ========== */
+/* ========== 文件列表区域 ========== */
 .file-list-section {
   margin: 0 24rpx 24rpx;
   padding: 0;
   overflow: hidden;
 }
 
+/* 列表头部 */
 .list-header {
   display: flex;
   justify-content: space-between;
@@ -287,31 +422,31 @@
   border-radius: 20rpx;
 }
 
-/* ========== 搜索框样式（已移除独立区域，内嵌到表头） ========== */
-
-/* ========== 表格滚动容器 ========== */
+/* ========== 表格容器 ========== */
 .table-wrapper {
   padding: 0;
 }
 
+/* 固定表头，防止随内容滚动 */
 .table-header-fixed {
-  /* 表头固定在顶部 */
   position: sticky;
   top: 0;
   z-index: 10;
   background-color: var(--bg-color);
 }
 
+/* 列表体可滚动区域 */
 .table-body-scroll {
   max-height: 1100rpx;
   overflow-y: auto;
 }
 
+/* 选中行高亮 */
 .selected-row {
   background-color: rgba(0, 82, 217, 0.08) !important;
 }
 
-/* 图标操作按钮组 */
+/* 行内操作按钮组 */
 .action-btns {
   display: flex;
   align-items: center;
@@ -372,7 +507,7 @@
   margin-bottom: 32rpx;
 }
 
-/* ========== 加载状态 ========== */
+/* ========== 加载中状态 ========== */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -387,7 +522,7 @@
   margin-top: 20rpx;
 }
 
-/* ========== 列表底部 ========== */
+/* ========== 列表底部提示 ========== */
 .list-footer {
   padding: 20rpx;
   display: flex;
@@ -402,12 +537,7 @@
   color: var(--text-placeholder);
 }
 
-/* ========== 原生表格样式 ========== */
-.table {
-  width: 100%;
-  font-size: 26rpx;
-}
-
+/* ========== 表格行列基础样式 ========== */
 .tr {
   display: flex;
   align-items: center;
@@ -434,6 +564,7 @@
   padding: 20rpx 12rpx;
 }
 
+/* 复选框列 */
 .th-checkbox, .td-checkbox {
   display: flex;
   width: 80rpx;
@@ -449,13 +580,14 @@
   transform: scale(0.9);
 }
 
+/* 文件名列 */
 .th-name, .td-name {
   flex: 1;
   padding: 20rpx 16rpx;
   overflow: hidden;
 }
 
-/* 文件名列头（标签 + 搜索框同行，flex 布局不重叠） */
+/* 表头文件名列：标签 + 搜索框同行 */
 .th-name {
   flex-direction: row;
   align-items: center;
@@ -471,7 +603,7 @@
   flex-shrink: 0;
 }
 
-/* 内嵌搜索栏（自适应填充，含搜索图标） */
+/* 内嵌搜索框 */
 .inline-search {
   display: flex;
   align-items: center;
@@ -508,6 +640,7 @@
   justify-content: center;
 }
 
+/* 操作列 */
 .th-action, .td-action {
   width: 200rpx;
   min-width: 200rpx;
@@ -515,7 +648,7 @@
   flex-shrink: 0;
 }
 
-/* 文件名样式 */
+/* 文件名单元格 */
 .td-name {
   display: flex;
   align-items: center;
@@ -531,81 +664,4 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 26rpx;
-}
-
-/* ========== 物流追踪按钮（TDesign 科技时尚风格优化） ========== */
-
-/* ---- 默认态：追踪 ---- */
-.tracking-btn {
-  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%) !important;
-  border: none !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  border-radius: 12rpx !important; /* 保持与配置/刷新按钮圆角一致 */
-  box-shadow:
-          0 6rpx 20rpx rgba(0, 114, 255, 0.35),
-          inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3) !important;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-}
-
-.tracking-btn:active {
-  transform: scale(0.95);
-  background: linear-gradient(135deg, #00a8e8 0%, #005ed9 100%) !important;
-  box-shadow: 0 4rpx 10rpx rgba(0, 114, 255, 0.2) !important;
-}
-
-/* ---- 追踪中：停止（融入头部蓝白科技风格，柔和呼吸光效体现运行态） ---- */
-.tracking-active {
-  /* 与其他头部按钮统一的白玻璃底 */
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 2rpx solid rgba(255, 255, 255, 0.45) !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  border-radius: 12rpx !important;
-  backdrop-filter: blur(10rpx);
-  will-change: box-shadow;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  animation: tracking-pulse 2.2s ease-in-out infinite;
-}
-
-.tracking-active:active {
-  transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-}
-
-/* ---- 运行中闪烁圆点指示器 ---- */
-.tracking-dot {
-  display: inline-block;
-  font-size: 28rpx;
-  margin-left: 10rpx;
-  color: #00e5ff;
-  vertical-align: middle;
-  line-height: 1;
-  animation: dot-blink 1.2s ease-in-out infinite;
-}
-
-@keyframes dot-blink {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 10rpx rgba(0, 229, 255, 0.9), 0 0 20rpx rgba(0, 229, 255, 0.4);
-  }
-  50% {
-    opacity: 0.3;
-    text-shadow: 0 0 4rpx rgba(0, 229, 255, 0.4);
-  }
-}
-
-/* ---- 呼吸光晕动画（柔和的蓝白色光晕，与头部渐变和谐统一） ---- */
-@keyframes tracking-pulse {
-  0%, 100% {
-    box-shadow:
-            0 0 0 0 rgba(0, 200, 255, 0.3),
-            inset 0 1rpx 2rpx rgba(255, 255, 255, 0.15);
-  }
-  50% {
-    box-shadow:
-            0 0 18rpx 5rpx rgba(0, 200, 255, 0.18),
-            inset 0 1rpx 2rpx rgba(255, 255, 255, 0.15);
-  }
 }

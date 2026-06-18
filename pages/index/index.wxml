@@ -1,7 +1,10 @@
 <view class="page-container">
-    <!-- 顶部导航栏 -->
+
+    <!-- ===== 顶部导航栏 ===== -->
     <view class="header">
         <view class="header-content">
+
+            <!-- 左侧 Logo + 标题 -->
             <view class="header-left">
                 <view class="logo-area">
                     <view class="logo-icon">☁️</view>
@@ -11,41 +14,64 @@
                     </view>
                 </view>
             </view>
+
+            <!-- 右侧操作按钮组 -->
             <view class="header-actions">
                 <view class="action-btn-group">
+
+                    <!-- 配置按钮：打开 COS 密钥/Bucket 配置弹窗 -->
                     <view class="action-btn-item" bind:tap="openConfig">
                         <t-icon name="setting" size="32rpx" color="#ffffff"/>
                         <text class="action-btn-text">配置</text>
                     </view>
+
+                    <!-- 刷新按钮：重新拉取存储桶文件列表，加载中时图标旋转 -->
                     <view class="action-btn-item action-btn-primary" bind:tap="fetchFileList">
                         <view class="refresh-icon {{ listLoading ? 'spinning' : '' }}">↻</view>
                         <text class="action-btn-text">刷新</text>
                     </view>
-                    <t-button
-                            theme="primary"
-                            size="medium"
-                            icon="{{ isTracking ? 'stop-circle' : 'location' }}"
-                            bind:tap="toggleTracking"
-                            class="custom-track-btn {{ isTracking ? 'tracking-active' : 'tracking-btn' }}"
+
+                    <!-- 位置上报按钮：切换 GPS 位置上报开关
+                         - 默认态：渐变蓝，显示"开始位置上报"
+                         - 上报中：青蓝光晕呼吸 + 闪烁圆点，显示"位置上报中" -->
+                    <view
+                        class="track-btn {{ isTracking ? 'track-btn--active' : '' }}"
+                        bind:tap="toggleTracking"
                     >
-                        {{ isTracking ? '位置上报中' : '开始位置上报'}}
-                        <text class="tracking-dot" wx:if="{{ isTracking }}">●</text>
-                    </t-button>
+                        <!-- 上报中：脉冲圆点指示器（环与点同周期闪烁） -->
+                        <view wx:if="{{ isTracking }}" class="tracking-dot-wrap">
+                            <view class="tracking-dot-ring"></view>
+                            <view class="tracking-dot"></view>
+                        </view>
+                        <!-- 默认态：定位图标 -->
+                        <t-icon wx:else name="location" size="30rpx" color="#ffffff"/>
+                        <text class="track-btn-text">
+                            {{ isTracking ? '位置上报中' : '开始位置上报' }}
+                        </text>
+                    </view>
+
                 </view>
             </view>
+
         </view>
     </view>
 
-    <!-- 文件上传区 -->
+    <!-- ===== 文件上传区 ===== -->
     <view class="upload-section card">
+        <!-- 上传触发按钮：唤起选择来源弹窗（相册 / 文件） -->
         <view class="upload-btn-wrap">
-            <t-button size="large" icon="upload" theme="primary" variant="text" class="upload-inner-btn"
-                      bind:tap="showUploadSource">选择文件上传
-            </t-button>
+            <t-button
+                size="large"
+                icon="upload"
+                theme="primary"
+                variant="text"
+                class="upload-inner-btn"
+                bind:tap="showUploadSource"
+            >选择文件上传</t-button>
         </view>
         <text class="upload-tip">支持所有文件类型上传，建议一次不超过 10 份</text>
 
-        <!-- 上传队列 -->
+        <!-- 上传队列：实时展示每个文件的上传进度与状态 -->
         <view wx:if="{{ uploadQueue.length > 0 }}" class="upload-queue">
             <view wx:for="{{ uploadQueue }}" wx:key="index" class="upload-item">
                 <view class="upload-info">
@@ -61,33 +87,44 @@
         </view>
     </view>
 
-    <!-- 文件列表 -->
+    <!-- ===== 文件列表 ===== -->
     <view class="file-list-section card">
-        <!-- 列表头部 -->
+
+        <!-- 列表头部：标题 + 批量删除操作区 -->
         <view class="list-header">
             <view class="list-title-area">
                 <t-icon name="folder-open" size="36rpx"/>
                 <text class="list-title">存储桶文件</text>
-                <view class="file-count" wx:if="{{ filteredFiles.length > 0 }}">{{ filteredFiles.length }} 个文件</view>
+                <view class="file-count" wx:if="{{ filteredFiles.length > 0 }}">
+                    {{ filteredFiles.length }} 个文件
+                </view>
             </view>
+            <!-- 选中文件后显示批量删除 -->
             <view class="list-actions" wx:if="{{ selectedFiles.length > 0 }}">
                 <view class="selected-badge">
                     <text>已选 {{ selectedFiles.length }}</text>
                 </view>
-                <t-button theme="danger" size="small" variant="outline" icon="delete" bind:tap="batchDelete">批量删除
+                <t-button theme="danger" size="small" variant="outline" icon="delete" bind:tap="batchDelete">
+                    批量删除
                 </t-button>
             </view>
         </view>
 
-        <!-- 文件表格（表头始终可见，包含内嵌搜索） -->
+        <!-- 文件表格（表头固定，内嵌搜索框） -->
         <view class="table-wrapper">
-            <!-- 固定表头 -->
+
+            <!-- 固定表头行：含全选复选框 + 内嵌文件名搜索 -->
             <view class="table-header-fixed">
                 <view class="tr header-row">
+                    <!-- 全选 / 取消全选 -->
                     <view class="th th-checkbox" bindtap="toggleSelectAll">
-                        <t-icon name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}" size="44rpx"
-                                color="{{ isAllSelected ? '#0052d9' : '#999' }}"/>
+                        <t-icon
+                            name="{{ isAllSelected ? 'check-circle-filled' : 'circle' }}"
+                            size="44rpx"
+                            color="{{ isAllSelected ? '#0052d9' : '#999' }}"
+                        />
                     </view>
+                    <!-- 文件名列：内嵌关键字搜索 -->
                     <view class="th th-name">
                         <text class="th-label">文件名</text>
                         <view class="inline-search">
@@ -108,28 +145,40 @@
                     <view class="th th-action">操作</view>
                 </view>
             </view>
-            <!-- 可滚动表体 -->
+
+            <!-- 文件列表行：支持单选、预览、下载、删除 -->
             <view wx:if="{{ filteredFiles.length > 0 }}" class="table-body-scroll">
-                <view wx:for="{{ filteredFiles }}" wx:key="key" class="tr {{ item.selected ? 'selected-row' : '' }}">
+                <view
+                    wx:for="{{ filteredFiles }}"
+                    wx:key="key"
+                    class="tr {{ item.selected ? 'selected-row' : '' }}"
+                >
+                    <!-- 单行勾选 -->
                     <view class="td td-checkbox" bindtap="toggleSelect" data-key="{{ item.key }}">
-                        <t-icon name="{{ item.selected ? 'check-circle-filled' : 'circle' }}" size="44rpx"
-                                color="{{ item.selected ? '#0052d9' : '#999' }}"/>
+                        <t-icon
+                            name="{{ item.selected ? 'check-circle-filled' : 'circle' }}"
+                            size="44rpx"
+                            color="{{ item.selected ? '#0052d9' : '#999' }}"
+                        />
                     </view>
+                    <!-- 文件名（点击打开文件） -->
                     <view class="td td-name" bindtap="openFile" data-file="{{ item }}">
-                        <t-icon name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}"
-                                size="40rpx"/>
+                        <t-icon
+                            name="{{ item.type === 'image' ? 'image' : item.type === 'pdf' ? 'file-pdf' : 'file' }}"
+                            size="40rpx"
+                        />
                         <text class="file-name">{{ item.name }}</text>
                     </view>
+                    <!-- 操作按钮组：预览 / 下载 / 删除 -->
                     <view class="td td-action">
                         <view class="action-btns">
-                            <view class="action-btn" catchtap="previewFile" data-file="{{ item }}" title="预览">
+                            <view class="action-btn" catchtap="previewFile" data-file="{{ item }}">
                                 <t-icon name="browse" size="38rpx" color="#0052d9"/>
                             </view>
-                            <view class="action-btn" catchtap="downloadFile" data-file="{{ item }}" title="下载">
+                            <view class="action-btn" catchtap="downloadFile" data-file="{{ item }}">
                                 <t-icon name="download" size="38rpx" color="#00875a"/>
                             </view>
-                            <view class="action-btn action-btn-danger" catchtap="deleteFile" data-file="{{ item }}"
-                                  title="删除">
+                            <view class="action-btn action-btn-danger" catchtap="deleteFile" data-file="{{ item }}">
                                 <t-icon name="delete" size="38rpx" color="#d54941"/>
                             </view>
                         </view>
@@ -137,7 +186,7 @@
                 </view>
             </view>
 
-            <!-- 空状态 -->
+            <!-- 搜索无结果空状态 -->
             <view wx:elif="{{ !listLoading && searchKeyword }}" class="empty-state">
                 <view class="empty-icon-area">
                     <t-icon name="search" size="120rpx"/>
@@ -147,6 +196,7 @@
                 <t-button theme="primary" variant="outline" icon="close" bindtap="clearSearch">清除搜索</t-button>
             </view>
 
+            <!-- 存储桶为空状态 -->
             <view wx:elif="{{ !listLoading }}" class="empty-state">
                 <view class="empty-icon-area">
                     <t-icon name="file-clear" size="120rpx"/>
@@ -156,19 +206,22 @@
                 <t-button theme="primary" variant="outline" icon="upload" bindtap="showUploadSource">上传文件</t-button>
             </view>
 
-            <!-- 加载状态 -->
+            <!-- 加载中状态 -->
             <view wx:else class="loading-state">
                 <t-loading theme="circular" size="60rpx"/>
                 <text class="loading-text">加载中...</text>
             </view>
+
         </view>
 
-        <!-- 数据量提示 -->
+        <!-- 列表底部：总文件数提示 -->
         <view wx:if="{{ filteredFiles.length > 0 }}" class="list-footer">
             <text class="footer-text">共 {{ filteredFiles.length }} 个文件</text>
         </view>
+
     </view>
 
-        <!-- Toast -->
+    <!-- 全局 Toast 提示组件 -->
     <t-toast id="t-toast"/>
+
 </view>
