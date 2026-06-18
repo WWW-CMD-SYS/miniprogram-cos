@@ -7,7 +7,7 @@
  *   // 开始持续追踪
  *   startTracking({
  *     deviceId: 'truck-001',
- *     serverUrl: 'http://192.168.1.100:3001',
+ *     serverUrl: 'http://wxjsun.com:3001',
  *     onUpdate: (pos) => console.log(pos)
  *   })
  *
@@ -25,7 +25,7 @@ let options = {}
 let updateCallback = null
 
 // 默认服务器地址（开发时请替换为你的电脑局域网 IP）
-const DEFAULT_SERVER = 'http://192.168.1.100:3001'
+const DEFAULT_SERVER = 'http://wxjsun.com:3001'
 
 // ====================== 持续追踪 ======================
 

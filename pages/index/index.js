@@ -253,7 +253,7 @@ Page({
   startLocationTracking() {
     // 替换为你的服务器地址
     // 查看本机IP：ifconfig | grep "inet " | grep -v 127.0.0.1
-    const serverUrl = 'http://101.43.98.105:3001';
+    const serverUrl = 'http://wxjsun.com:3001';
 
     startTracking({
       deviceId: 'truck-001',
