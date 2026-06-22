@@ -266,7 +266,7 @@ Page({
     });
 
     this.setData({ isTracking: true });
-    wx.showToast({ title: '已开始追踪', icon: 'success', duration: 1500 });
+    wx.showToast({ title: '已开始追踪', icon: 'success', duration: 3000 });
   },
 
   /**

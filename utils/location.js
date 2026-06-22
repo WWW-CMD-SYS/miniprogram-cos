@@ -2,7 +2,7 @@
  * 物流坐标上报工具
  *
  * 用法：
- *   import { startTracking, stopTracking, getCurrentPosition } from '../../utils/location'
+ *   import { startTracking, stopTracking, getTrackingStatus } from '../../utils/location'
  *
  *   // 开始持续追踪
  *   startTracking({
@@ -11,38 +11,46 @@
  *     onUpdate: (pos) => console.log(pos)
  *   })
  *
+ *   // 查看当前是否在追踪
+ *   getTrackingStatus()
+ *
  *   // 停止追踪
  *   stopTracking()
- *
- *   // 单次获取
- *   const pos = await getCurrentPosition()
  */
 
-// ====================== 状态管理 ======================
-let isTracking = false
-let locationListener = null
-let options = {}
-let updateCallback = null
+// ====================== 内部状态 ======================
 
-// 默认服务器地址（开发时请替换为你的电脑局域网 IP）
+// 是否正在追踪
+let isTracking = false
+// 微信位置变化的回调函数引用（用于注销监听）
+let locationListener = null
+// 追踪配置
+let options = {}
+// 外部传入的位置更新回调
+let updateCallback = null
+// 上次上报服务器的时间戳（用于限频）
+let lastReportTime = 0
+
+// 默认服务器地址
 const DEFAULT_SERVER = 'http://wxjsun.com:3001'
 
-// ====================== 持续追踪 ======================
+// ====================== 对外方法 ======================
 
 /**
- * 开始持续上报位置
- * @param {Object} opts
- * @param {string} opts.deviceId - 设备/车辆编号
+ * 开始持续追踪位置，定时上报到服务器
+ * @param {Object} opts 配置项
+ * @param {string} opts.deviceId - 设备/车辆编号，默认 'default'
  * @param {string} opts.serverUrl - 坐标接收服务器地址
- * @param {Function} opts.onUpdate - 位置更新回调 (pos) => {}
- * @param {number} opts.interval - 上报间隔(毫秒)，默认 3000
+ * @param {Function} opts.onUpdate - 每次获取到位置后的回调 (pos) => {}
+ * @param {number} opts.interval - 上报间隔（毫秒），默认 3000
  */
 export function startTracking(opts = {}) {
   if (isTracking) {
-    console.warn('[Location] 已在追踪中')
+    console.warn('[Location] 已在追踪中，请勿重复开启')
     return
   }
 
+  // 保存配置
   options = {
     deviceId: opts.deviceId || 'default',
     serverUrl: opts.serverUrl || DEFAULT_SERVER,
@@ -50,48 +58,43 @@ export function startTracking(opts = {}) {
   }
   updateCallback = opts.onUpdate || null
 
-  // ✅ 关键修复：先标记追踪状态为 true，确保 stopTracking() 能立即生效
-  // 之前将 isTracking=true 放在 wx.startLocationUpdate 的 success 回调中，
-  // 导致异步时序下 stopTracking() 因状态仍未更新而提前 return，无法停止追踪
+  // 提前标记为追踪中，避免 stopTracking() 在异步过程中因状态不对而失效
   isTracking = true
 
-  // 注册位置变化回调（在启动监听前预定义，避免竞态）
+  // 位置变化时的处理函数：把微信返回的坐标整理后，通知页面并上报服务器
   locationListener = (res) => {
     const pos = {
-      lng: res.longitude,
-      lat: res.latitude,
-      speed: res.speed || 0,
-      heading: 0,          // 小程序 onLocationChange 不返回 heading
-      accuracy: res.accuracy || 0,
-      time: Date.now()
+      lng: res.longitude,       // 经度
+      lat: res.latitude,        // 纬度
+      speed: res.speed || 0,    // 速度（米/秒）
+      heading: 0,               // 设备方向角，微信 onLocationChange 不返回此字段，固定为 0
+      accuracy: res.accuracy || 0, // 定位精度（米）
+      time: Date.now()          // 当前时间戳（毫秒）
     }
     console.log('[Location] 位置更新:', pos.lng, pos.lat)
 
-    // 通知回调
     if (updateCallback) {
       updateCallback(pos)
     }
 
-    // 上报到后台
     reportPosition(pos)
   }
 
-  // 启动位置监听（前台定位）
+  // 启动微信小程序的持续定位
   wx.startLocationUpdate({
     success: () => {
-      // 二次检查：用户可能已在异步期间调用了 stopTracking()
+      // 可能在等待期间用户已经调用了 stopTracking()
       if (!isTracking) {
-        console.warn('[Location] 追踪已在启动过程中被停止，跳过监听注册')
+        console.warn('[Location] 已在启动过程中被停止，不再注册监听')
         return
       }
-      console.log('[Location] 位置监听已启动')
-      // 注册位置变化回调
+      //微信持续获取位置信息的方法--注册位置变化监听：每当 GPS 检测到位置变化，就触发 locationListener 处理
       wx.onLocationChange(locationListener)
-      console.log('[Location] 持续追踪已开始 deviceId=' + options.deviceId)
+      console.log('[Location] 追踪已启动, deviceId=' + options.deviceId)
     },
     fail: (err) => {
-      console.error('[Location] 启动位置监听失败:', err)
-      // 失败时回滚状态，保证 stopTracking() 不会误认为仍在追踪
+      console.error('[Location] 启动定位失败:', err)
+      // 启动失败，回滚状态
       isTracking = false
       locationListener = null
       updateCallback = null
@@ -105,66 +108,47 @@ export function startTracking(opts = {}) {
 }
 
 /**
- * 停止上报
+ * 停止位置追踪，注销监听
  */
 export function stopTracking() {
   if (!isTracking) return
 
+  // 注销微信的位置监听
   if (locationListener) {
     wx.offLocationChange(locationListener)
     locationListener = null
   }
 
+  // 停止微信的定位服务
   wx.stopLocationUpdate({
     success: () => {
-      console.log('[Location] 位置监听已停止')
+      console.log('[Location] 定位服务已关闭')
     }
   })
 
+  // 重置内部状态
   isTracking = false
   updateCallback = null
-  console.log('[Location] 持续追踪已停止')
+  lastReportTime = 0
+  console.log('[Location] 追踪已停止')
 }
 
 /**
- * 获取追踪状态
+ * 查询当前是否正在追踪
+ * @returns {boolean}
  */
 export function getTrackingStatus() {
   return isTracking
 }
 
-// ====================== 单次定位 ======================
+// ====================== 内部方法 ======================
 
 /**
- * 获取当前单次位置（使用 gcj02 坐标系，与高德地图兼容）
+ * 把位置数据 POST 到后台服务器
+ * 内置限频逻辑，按 options.interval 控制上报频率
  */
-export function getCurrentPosition() {
-  return new Promise((resolve, reject) => {
-    wx.getLocation({
-      type: 'gcj02',
-      success: (res) => {
-        resolve({
-          lng: res.longitude,
-          lat: res.latitude,
-          speed: res.speed || 0,
-          accuracy: res.accuracy || 0,
-          time: Date.now()
-        })
-      },
-      fail: (err) => {
-        reject(err)
-      }
-    })
-  })
-}
-
-// ====================== 内部：上报到服务器 ======================
-
-let lastReportTime = 0
-
 function reportPosition(pos) {
   const now = Date.now()
-  // 限频：避免过于频繁的请求
   if (now - lastReportTime < options.interval) return
   lastReportTime = now
 
@@ -172,11 +156,11 @@ function reportPosition(pos) {
     url: `${options.serverUrl}/api/location`,
     method: 'POST',
     data: {
-      lng: pos.lng,
-      lat: pos.lat,
-      speed: pos.speed,
-      heading: pos.heading,
-      deviceId: options.deviceId,
+      lng: pos.lng,           // 经度
+      lat: pos.lat,           // 纬度
+      speed: pos.speed,       // 速度（米/秒）
+      heading: pos.heading,   // 设备方向角（0~360）
+      deviceId: options.deviceId, // 设备/车辆编号
     },
     success: (res) => {
       if (res.data?.code === 0) {
